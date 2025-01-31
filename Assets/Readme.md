@@ -23,10 +23,3 @@ This template includes the settings and assets you need to start creating with t
 
 - [Outline Post Process in Unity Shader Graph URP](https://github.com/daniel-ilett/shaders-fullscreen-outlines)
 - [Shader Graph Custom Lighting](https://github.com/Cyanilux/URP_ShaderGraphCustomLighting)
-
-
-# Known Issues:
-
-- Enemy is dying instantly when hit instead of taking multiple hits (obbeying health).
-- FluidZone is not applying drag to the player.
-- IcyZone not implemented yet.

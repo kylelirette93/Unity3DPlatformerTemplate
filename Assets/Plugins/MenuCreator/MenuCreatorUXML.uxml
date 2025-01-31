@@ -1,12 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/MenuCreator/MenuCreatorStylesheet.uss?fileID=7433441132597879392&amp;guid=fc4614bea4bc39447b664aa2b65b8641&amp;type=3#MenuCreatorStylesheet" />
+    <Style src="project://database/Assets/Plugins/MenuCreator/MenuCreatorStylesheet.uss?fileID=7433441132597879392&amp;guid=fc4614bea4bc39447b664aa2b65b8641&amp;type=3#MenuCreatorStylesheet" />
     <ui:VisualElement name="MenuRoot" style="flex-grow: 1; align-items: center; justify-content: center; display: none;">
         <ui:VisualElement name="MenuPanel" class="MenuPanel" />
         <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="MenuTitle" class="MenuTitle" />
-        <ui:VisualElement name="LoadingIcon" style="background-image: url(&apos;project://database/Assets/MenuCreator/loading.png?fileID=21300000&amp;guid=db524745f7e2b734b91c1281f6407ca7&amp;type=3#loading&apos;); width: 64px; height: 64px; rotate: 0; position: absolute; display: none;" />
+        <ui:VisualElement name="LoadingIcon" style="background-image: url(&quot;project://database/Assets/Plugins/MenuCreator/loading.png?fileID=21300000&amp;guid=db524745f7e2b734b91c1281f6407ca7&amp;type=3#loading&quot;); width: 64px; height: 64px; rotate: 0; position: absolute; display: none;" />
         <ui:VisualElement name="LoadingProgressBG" class="progressBar--background" style="display: none;">
             <ui:VisualElement name="LoadingProgressBar" class="progressBar--overlay" />
         </ui:VisualElement>
         <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="LoadingLabel" text="Test" class="LoadingLabel" style="display: none;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="HudHolder" picking-mode="Ignore" style="flex-grow: 1; position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
+        <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" picking-mode="Ignore" name="MiddleScreenText" style="-unity-font: resource(&apos;FlatSkin/Font/Roboto-Black&apos;); -unity-font-style: bold; font-size: 38%; -unity-text-align: middle-center; justify-content: center; top: 40%; position: absolute; left: 0; right: 0; bottom: 10%; color: rgb(255, 255, 255); -unity-text-outline-width: 2px; -unity-text-outline-color: rgb(25, 25, 28); text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.47); white-space: normal;" />
+        <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" picking-mode="Ignore" name="BottomLeftText" style="-unity-font: resource(&apos;FlatSkin/Font/Roboto-Bold&apos;); -unity-font-style: bold; font-size: 22%; -unity-text-align: middle-left; justify-content: center; top: 88%; position: absolute; left: 3%; right: 3%; bottom: 3%; color: rgb(255, 255, 255); -unity-text-outline-color: rgb(0, 0, 0); -unity-text-outline-width: 1px; text-shadow: 1px 2px 1px rgba(0, 0, 0, 0.43); white-space: normal;" />
     </ui:VisualElement>
 </ui:UXML>

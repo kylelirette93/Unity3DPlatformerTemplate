@@ -81,7 +81,7 @@ public class ThirdPersonCamera : MonoBehaviour
 		}
 	}
 	
-	private void Update()
+	private void LateUpdate()
 	{
 		if (!followTarget) return;
 		
@@ -116,8 +116,8 @@ public class ThirdPersonCamera : MonoBehaviour
 	private void UpdateCameraPosition()
 	{
 		// Update orbit pivot position
-		orbitPivot.position = followTarget.position;
-		orbitPivot.Translate(cameraOffset, Space.Self);
+		orbitPivot.position = followTarget.transform.position + orbitPivot.transform.TransformDirection(cameraOffset);
+		//orbitPivot.Translate(cameraOffset, Space.Self);
 		
 		// Orbit around target based on input
 		float rotationAmount = OrbitInput * orbitSpeed * Time.deltaTime;

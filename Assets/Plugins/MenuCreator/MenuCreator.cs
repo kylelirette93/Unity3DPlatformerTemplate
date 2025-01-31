@@ -20,7 +20,8 @@ public class MenuCreator : MonoBehaviour
     protected VisualElement m_InteractWindow,m_LoadingIcon;
     protected Label m_InteractLabel,m_DebugText;
     [HideInInspector]
-    public Label m_MenuTitle,m_LoadingLabel;
+    public Label m_MenuTitle,m_LoadingLabel, m_BottomLeftLabel, m_MiddleScreenLabel;
+
 
     public virtual void Awake()
     {
@@ -32,8 +33,11 @@ public class MenuCreator : MonoBehaviour
         m_ProgressBar = m_Root.Q<VisualElement>("LoadingProgressBar");
         m_MenuPanel = m_Root.Q<VisualElement>("MenuPanel");
         m_MenuTitle = m_Root.Q<Label>("MenuTitle");
+        m_BottomLeftLabel = m_Root.Q<Label>("BottomLeftText");
+        m_MiddleScreenLabel = m_Root.Q<Label>("MiddleScreenText");
         m_LoadingLabel = m_MenuHolder.Q<Label>("LoadingLabel");
         m_LoadingIcon = m_MenuHolder.Q<VisualElement>("LoadingIcon");
+
     }
 
     public bool menuFullyLoaded {
@@ -90,11 +94,14 @@ public class MenuCreator : MonoBehaviour
         desiredLoadingText = newString;
     }
 
-    public Label AddBigLabel(string labelContent)
+    public Label AddBigLabel(string labelContent, VisualElement overridePanel = null)
     {
         Label nweLabel = new Label(labelContent);
         nweLabel.AddToClassList("ExtraText");
-        m_MenuPanel.Add(nweLabel);
+        if (overridePanel != null)
+            overridePanel.Add(nweLabel);
+        else
+            m_MenuPanel.Add(nweLabel);
         createdVisualElements.Add(nweLabel);
         return nweLabel;
     }

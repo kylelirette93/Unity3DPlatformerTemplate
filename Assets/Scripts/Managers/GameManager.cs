@@ -17,11 +17,22 @@ public class GameManager : Singleton<GameManager>
     [Tooltip("Layers that contain players")]
     public LayerMask playerMask;
 
-    public int CoinsCollected {get;set;}
+    private int _coinsCollected;
+    public int CoinsCollected {get => _coinsCollected;
+        set { 
+            // Whenever we set the Coins Colected amount we should update the UI.
+            if (_coinsCollected != value) {
+                    _coinsCollected = value;
+                    menuHelper.m_BottomLeftLabel.text = value != 0 ? $"Coins: {value}" : "";
+                }
+            }
+    }
+
     MenuCreator menuHelper;
     public MenuCreator MenuHelper { get => menuHelper; }
     private PlayerInputManager playerInputManager;
 
+    private int trackPlayerCount = 0;
     /// <summary>
     /// This ensures game manager will be created even if no one else calls Instance after the game starts.
     /// </summary>
@@ -64,11 +75,27 @@ public class GameManager : Singleton<GameManager>
             //playerInputManager.joinAction = pressToJoin;
             playerInputManager.EnableJoining();
         }
+
+        ToggleShowPressStartToJoin();
+
+        if (PlayerController.players.Count == 0 && Camera.allCamerasCount == 0)
+        {
+            var newCameraGO = new GameObject("Camera");
+            newCameraGO.AddComponent<Camera>();
+            newCameraGO.transform.position = CheckpointManager.CurrentCheckpoint.w != 0 ?
+(Vector3)CheckpointManager.CurrentCheckpoint + ((Vector3.one * 10f)) : (Vector3.one * 10f);
+            newCameraGO.transform.rotation = Quaternion.Euler(Quaternion.LookRotation(newCameraGO.transform.position.directionTo(CheckpointManager.CurrentCheckpoint.w != 0 ?
+(Vector3)CheckpointManager.CurrentCheckpoint : (Vector3.one))).eulerAngles.SetZ(0f));
+        }
     }
 
     public void Update()
     {
         PositionSoundManagerInPlayerMiddle();
+        if (trackPlayerCount != PlayerController.players.Count) {
+            trackPlayerCount = PlayerController.players.Count;
+            ToggleShowPressStartToJoin();
+        }
     }
 
     public void PositionSoundManagerInPlayerMiddle()
@@ -95,12 +122,19 @@ public class GameManager : Singleton<GameManager>
             playerController.JoinedThroughGameManager = true;
         }
         SceneTransitioner.DisableOtherSceneCameras(true);
+        ToggleShowPressStartToJoin();
     }
 
     public void OnPlayerLeft(PlayerInput inputLeft)
     {
         if (Camera.main != null && PlayerController.players.Count == 0)
             Camera.main.gameObject.SetActive(true);
+        ToggleShowPressStartToJoin();
+    }
+
+    public void ToggleShowPressStartToJoin()
+    {
+        MenuHelper.m_MiddleScreenLabel.text = PlayerController.players.Count == 0 ? "Press [ A ] on gamepad\nor [ Space ] to start!" : "";
     }
 
     bool _isShowingOtherMenu = false;
@@ -129,7 +163,6 @@ public class GameManager : Singleton<GameManager>
 
         if (!_isShowingPauseMenu)
         {
-            
             menuHelper.StartBasicMenu("Pause Menu");
             menuHelper.AddButton(new MenuButton("Reset", ResetLevel));
             menuHelper.AddButton(new MenuButton("Unpause", TogglePauseMenu));

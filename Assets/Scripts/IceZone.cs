@@ -36,11 +36,7 @@ public class IceZone : MonoBehaviour
     [Header("Effects")]
     [Tooltip("Sound played when objects start sliding")]
     public AudioClip slideSound;
-    
-    [Tooltip("Volume of the slide sound")]
-    [Range(0, 1)]
-    public float slideVolume = 0.5f;
-    
+
     /// <summary>
     /// Stores original friction values for restoration
     /// </summary>
@@ -49,7 +45,7 @@ public class IceZone : MonoBehaviour
     /// <summary>
     /// Tracks objects currently affected by the ice zone
     /// </summary>
-    private HashSet<GameObject> slidingObjects = new HashSet<GameObject>();
+    private List<GameObject> slidingObjects = new List<GameObject>();
     
     /// <summary>
     /// Ensures the collider is set up as a trigger
@@ -80,7 +76,13 @@ public class IceZone : MonoBehaviour
         
         // Store original friction
         originalFriction[collider.gameObject] = collider.material.dynamicFriction;
-        
+
+
+        if (collider.TryGetComponent(out MovementController mover))
+        {
+            mover.SetOverridingForceAndFriction(new Vector2(slipperiness, 1.0f - slipperiness));
+        }
+
         // Create ice physics material
         PhysicMaterial iceMaterial = new PhysicMaterial
         {
@@ -102,9 +104,8 @@ public class IceZone : MonoBehaviour
     /// </summary>
     private void PlaySlideSound(Collider collider)
     {
-        if (slideSound && collider.attachedRigidbody)
-        {
-            AudioSource.PlayClipAtPoint(slideSound, transform.position, slideVolume);
+        if (slideSound && collider.attachedRigidbody) {
+            slideSound.PlaySound(collider.transform.position);
         }
     }
     
@@ -122,6 +123,10 @@ public class IceZone : MonoBehaviour
     
     private void RestoreOriginalFriction(Collider other)
     {
+        if (other.TryGetComponent(out MovementController mover))
+        {
+            mover.SetOverridingForceAndFriction(Vector2.zero);
+        }
         if (originalFriction.TryGetValue(other.gameObject, out float friction))
         {
             if (other.material != null)
@@ -138,12 +143,10 @@ public class IceZone : MonoBehaviour
     void OnDestroy()
     {
         // Cleanup any remaining modified physics materials
-        foreach (GameObject obj in slidingObjects)
+        for (int i = slidingObjects.Count - 1; i >= 0; i--)
         {
-            if (obj != null && obj.TryGetComponent<Collider>(out var collider))
-            {
+            if (slidingObjects[i] != null && slidingObjects[i].TryGetComponent<Collider>(out var collider))
                 RestoreOriginalFriction(collider);
-            }
         }
     }
 } 

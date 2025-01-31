@@ -21,9 +21,11 @@ public class HealthController : MonoBehaviour
 	[Tooltip("Starting health amount of this object")]
 	[SerializeField] private int health = 1;
 	[Tooltip("Whether this object takes damage from physical collisions")]
-	public bool takesCollisionDamage;
+	public bool takesCollisionDamageFromRigidbodies;
+    [Tooltip("Whether this object takes damage from physical collisions")]
+    public bool takesCollisionDamageFromStaticbodies;
     [Tooltip("Minimum speed a collision hit must have to deal damage if takesCollisionDamage is true.")]
-    public float minCollisionDamageVelocity = 0.2f;
+    public float minCollisionDamageVelocity = 8.2f;
     [Tooltip("Whether this object should respawn after death. 0 Means no respawns, -1 means infinite respawns, any number above is treated as lives.")]
 	public int shouldRespawn = 0;
     [Tooltip("Seconds to wait before respawn (if respawning)")]
@@ -56,7 +58,7 @@ public class HealthController : MonoBehaviour
 	private Color[] defaultColors;
 	private int maxHealth, previousHealth, collisionDamage;
 	private bool isFlashingDamageColor = false;
-	private float nextFlashTime, damageFlashEndTime;
+	private float nextFlashTime, damageFlashEndTime, spawnedInTime;
 	
 	// Separate invulnerability from damage flash
 	public bool isInvulnerable { get; private set; }
@@ -69,6 +71,8 @@ public class HealthController : MonoBehaviour
 	/// </summary>
 	void Awake()
 	{
+        spawnedInTime = Time.time;
+        previousHealth = health;
 		maxHealth = health;
 		respawnPosition = transform.position;
 		TryGetComponent(out animator);
@@ -214,7 +218,9 @@ public class HealthController : MonoBehaviour
 			
 		transform.position = respawnPoint;
 		health = maxHealth;
-		if (animator)
+		spawnedInTime = Time.time;
+
+        if (animator)
 			animator.SetBool(MovementController.AnimationID_Death, false);
 	}
 	
@@ -255,14 +261,20 @@ public class HealthController : MonoBehaviour
 	/// <returns>True if the collision should cause damage, false otherwise</returns>
 	private bool ShouldProcessCollisionDamage(Collision collision)
 	{
-		if (!takesCollisionDamage) return false;
+		if (!takesCollisionDamageFromStaticbodies && !takesCollisionDamageFromRigidbodies) return false;
 		
 		foreach(string tag in ignoredCollisionTags)            
 			if(collision.transform.CompareTag(tag))
 				return false;
-				
-		if(!collision.rigidbody || collision.rigidbody.velocity.magnitude < minCollisionDamageVelocity)
-			return false;
+
+		if (takesCollisionDamageFromStaticbodies && !collision.rigidbody) {
+			if (collision.relativeVelocity.magnitude < minCollisionDamageVelocity)
+				return false;
+		} else if (takesCollisionDamageFromRigidbodies && collision.rigidbody)
+		{
+            if (Mathf.Max(collision.rigidbody.velocity.magnitude, collision.relativeVelocity.magnitude) < minCollisionDamageVelocity)
+                return false;
+        }
 			
 		return true;
 	}
@@ -275,10 +287,17 @@ public class HealthController : MonoBehaviour
 	{
 		if (!CanTakeDamage()) return;
 
-		if(collision.rigidbody)
-			collisionDamage = (int)Mathf.FloorToInt((collision.rigidbody.velocity.magnitude/4f * collision.rigidbody.mass));
-
-		ApplyDamage(collisionDamage);
+		collisionDamage = 0;
+		if (collision.rigidbody && takesCollisionDamageFromRigidbodies)
+		{
+			collisionDamage = (int)Mathf.RoundToInt((collision.rigidbody.velocity.magnitude * 0.2f) * collision.rigidbody.mass);
+		}
+		else if (!collision.rigidbody && takesCollisionDamageFromStaticbodies)
+		{
+            collisionDamage = (int)Mathf.RoundToInt((collision.relativeVelocity.magnitude) * 0.1f);
+		}
+		if (collisionDamage > 0)
+			ApplyDamage(collisionDamage);
 	}
 
 	/// <summary>
@@ -295,6 +314,6 @@ public class HealthController : MonoBehaviour
 	/// </summary>
 	private bool CanTakeDamage()
 	{
-		return !isInvulnerable && damageFlashEndTime < Time.time;
+		return !isInvulnerable && damageFlashEndTime < Time.time && spawnedInTime.HasTimeElapsedSince(0.33f);
 	}
 }

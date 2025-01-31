@@ -4,6 +4,7 @@ using DG.Tweening;
 using UnityEngine.UIElements;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Handles smooth scene transitions with fade effects and checkpoint loading.
@@ -110,6 +111,11 @@ public class SceneTransitioner : Singleton<SceneTransitioner>
 
     public static void DisableOtherSceneCameras(bool force = false)
     {
+        for (int i = 0; i < Camera.allCameras.Length; i++)
+        {
+            if (Camera.allCameras[i].TryGetComponent(out AudioListener audioListener))
+                GameObject.Destroy(audioListener);
+        }
         if (PlayerController.players.Count > 0 || force)
         {
             List<Camera> camerasToDisable = new List<Camera>();
