@@ -75,7 +75,7 @@ public class HealthController : MonoBehaviour
         previousHealth = health;
 		maxHealth = health;
 		respawnPosition = transform.position;
-		TryGetComponent(out animator);
+		animator = GetComponentInChildren<Animator>();
 		InitializeFlashRenderers();
 	}
 	

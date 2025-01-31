@@ -28,6 +28,8 @@ public class EnemyController : MonoBehaviour
     public bool ignoreHeight = true;
     [Tooltip("Minimum distance to maintain from target")]
     public float minTargetDistance = 0.7f;
+    [Tooltip("Collides with objects in the invulnerable layer (Turn off if you want the player to dash through this without colliding)")]
+    [SerializeField] private bool collidesWithInvulnerable = false;
     [Tooltip("Vision detection sensor")]
     public TriggerSensor visionSensor;
     [Tooltip("Attack detection sensor")]
@@ -37,8 +39,24 @@ public class EnemyController : MonoBehaviour
     private Animator animator;
     private HealthController health;
 
-    void Awake()
+    public static int InvulnerableLayer = -1;
+    /// <summary>
+    /// Initialize components and validate setup
+    /// </summary>
+    private void Awake()
     {
+        if (InvulnerableLayer == -1)
+            InvulnerableLayer = LayerMask.NameToLayer("Invulnerable");
+        if (!collidesWithInvulnerable)
+        {
+            foreach (var col in GetComponents<Collider>())
+            {
+                if (!(col.excludeLayers.isLayerInLayerMask(InvulnerableLayer)))
+                    col.excludeLayers |= (1 << InvulnerableLayer);
+                if (col.attachedRigidbody != null)
+                    col.attachedRigidbody.excludeLayers = col.excludeLayers;
+            }
+        }
         if (!CompareTag("Enemy")) {
             tag = "Enemy";
         }

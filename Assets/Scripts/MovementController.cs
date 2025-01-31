@@ -157,7 +157,7 @@ public class MovementController : MonoBehaviour
 	/// <param name="targetDirection">Direction or position to face towards</param>
 	/// <param name="rotationSpeed">How quickly to rotate towards the target direction</param>
 	/// <param name="lockVertical">If true, only considers horizontal rotation</param>
-	public void AlignWithDirection(Vector3 targetDirection, float rotationSpeed, bool lockVertical)
+	public void AlignWithDirection(Vector3 targetDirection, float rotationSpeed, bool lockVertical, bool force = false)
 	{
 		Vector3 currentPos = transform.position;
 		if(lockVertical) {
@@ -165,13 +165,13 @@ public class MovementController : MonoBehaviour
 			targetDirection.y = 0;
 		}
 		
-		Vector3 directionToTarget = targetDirection - currentPos;
-		ApplyRotation(directionToTarget, rotationSpeed);
+		Vector3 directionToTarget = targetDirection.magnitude < 3 ? targetDirection : (targetDirection - currentPos);
+		ApplyRotation(directionToTarget, rotationSpeed, force);
 	}
 	
-	private void ApplyRotation(Vector3 direction, float rotationSpeed)
+	private void ApplyRotation(Vector3 direction, float rotationSpeed, bool force = false)
 	{
-        if (!enabled)
+        if (!enabled && !force)
             return;
         if (direction.magnitude > 0.1f && Mathf.Abs(rotationSpeed) > 0.01f)
 		{
@@ -219,6 +219,17 @@ public class MovementController : MonoBehaviour
     private void ApplyFrictionForce(float friction)
     {
         rb.AddForce((currentVelocity * -1) * friction * Time.deltaTime, ForceMode.VelocityChange);
+    }
+
+
+    public void ApplyCustomSquashEffect(Vector3 customSquash)
+    {
+        if (!animator) return;
+        animator.transform.localScale = new Vector3(
+            customSquash.x * baseModelScale.x,  // Horizontal squeeze
+            customSquash.y * baseModelScale.y,   // Vertical stretch
+            customSquash.z * baseModelScale.z   // Horizontal squeeze
+        );
     }
 
     public void ApplyJumpSquashEffect()
