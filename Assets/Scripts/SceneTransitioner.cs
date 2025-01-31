@@ -99,7 +99,9 @@ public class SceneTransitioner : Singleton<SceneTransitioner>
             return;
         }
         Transitioning = false;
-        faderElement.DoFade(0.0f, fadeDuration).OnComplete(() => { Transitioning = false; });
+        faderElement.DoFade(0.0f, fadeDuration).OnComplete(() => { Transitioning = false;
+            faderElement.pickingMode = PickingMode.Ignore;
+        });
         NewSceneLoaded?.Invoke(scene.name);
 
         // If we have a player remove the camera from the scene.

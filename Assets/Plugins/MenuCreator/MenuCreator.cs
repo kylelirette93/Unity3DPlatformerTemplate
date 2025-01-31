@@ -101,6 +101,7 @@ public class MenuCreator : MonoBehaviour
 
     public void StartBasicMenu(string menuTitle)
     {
+        m_MenuHolder.pickingMode = PickingMode.Position;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         ClearButtons();

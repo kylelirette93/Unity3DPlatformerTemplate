@@ -38,6 +38,11 @@ public class InteractionController : MonoBehaviour
     
     public Vector3 ThrowForce => throwForce;
 
+    public bool IsCurrentInteractingWithThis(Interactable otherInteractable)
+    {
+        return currentInteractable == otherInteractable;
+    }
+
     private void Awake()
     {
         SetupComponents();
@@ -105,12 +110,13 @@ public class InteractionController : MonoBehaviour
     public void EndCurrentInteraction()
     {
         if (currentInteractable == null) return;
+
+        var endingInteraction = currentInteractable;
+        currentInteractable = null;
         
         PlaySound(releaseSound);
-        currentInteractable.OnInteractionEnd(this);
-        currentInteractable = null;
+        endingInteraction.OnInteractionEnd(this);
         lastInteractionTime = Time.time;
-        
         UpdateAnimator();
     }
 

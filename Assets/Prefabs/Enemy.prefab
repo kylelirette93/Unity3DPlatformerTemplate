@@ -99,10 +99,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 405930426841775479e96fab6c942806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 1.25
-  maxVelocity: 3
+  rotationSpeed: 2
+  maxVelocity: 8
   Acceleration: 40
-  Friction: 7.6
+  Friction: 3
   SquashEffect: {x: 1.2, y: 0.8, z: 1.2}
   StretchEffect: {x: 0.7, y: 1.2, z: 0.7}
   SquashAndStretchRecoverSpeed: 12
@@ -148,6 +148,7 @@ MonoBehaviour:
   takesCollisionDamage: 1
   minCollisionDamageVelocity: 0.2
   shouldRespawn: 0
+  respawnAfterSeconds: 1.5
   ignoredCollisionTags:
   - Enemy
   damageFlashInterval: 0.1

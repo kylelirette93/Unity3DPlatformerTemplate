@@ -129,6 +129,7 @@ public class GameManager : Singleton<GameManager>
 
         if (!_isShowingPauseMenu)
         {
+            
             menuHelper.StartBasicMenu("Pause Menu");
             menuHelper.AddButton(new MenuButton("Reset", ResetLevel));
             menuHelper.AddButton(new MenuButton("Unpause", TogglePauseMenu));

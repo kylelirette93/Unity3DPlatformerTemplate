@@ -44,6 +44,9 @@ public abstract class Interactable : MonoBehaviour
     /// <param name="controller">The player's interaction controller.</param>
     public virtual void OnInteractionEnd(InteractionController controller)
     {
+        if (controller != null && controller.IsCurrentInteractingWithThis(this)) {
+            controller.EndCurrentInteraction();
+        }    
         currentInteractor = null;
     }
     

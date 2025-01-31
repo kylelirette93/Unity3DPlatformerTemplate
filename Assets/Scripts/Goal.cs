@@ -9,15 +9,17 @@ public class Goal : MonoBehaviour
 {
 	[Header("Goal Effects")]
 	[Tooltip("Upward force applied to player while in the goal area")]
-	public float upwardsForce = 10f;
+	public float upwardsForce = 28f;
 	
 	[Header("Level Transition")]
 	[Tooltip("Time player must remain in goal area before transitioning")]
-	public float transitionDelay = 2.0f;
+	public float transitionDelay = 1.0f;
 	[Tooltip("Name of the scene to load when goal is reached")]
 	public string nextSceneName;
 	
 	private float timeInGoalArea;
+
+	private bool alreadyInTransition = false;
 	
 	/// <summary>
 	/// Ensures the collider is set up as a trigger
@@ -37,7 +39,7 @@ public class Goal : MonoBehaviour
 	/// </summary>
 	void OnTriggerStay(Collider other)
 	{
-		if (!other.CompareTag("Player")) return;
+		if (!other.CompareTag("Player") || alreadyInTransition) return;
 		
 		// Apply upward force if object has physics
 		if (other.TryGetComponent<Rigidbody>(out var rigidbody))
@@ -69,7 +71,9 @@ public class Goal : MonoBehaviour
 	/// </summary>
 	private void CompleteLevel()
 	{
-		if (string.IsNullOrEmpty(nextSceneName))
+		alreadyInTransition = true;
+
+        if (string.IsNullOrEmpty(nextSceneName))
 		{
 			Debug.LogError("Cannot complete level: No next scene specified!", this);
 			return;

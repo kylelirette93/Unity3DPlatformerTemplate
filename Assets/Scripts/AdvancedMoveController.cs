@@ -105,7 +105,7 @@ public class AdvancedMoveController : MovementController
     public bool RequestJump()
     {
         lastJumpRequestTime = Time.time;
-        if (isGrounded && slopeAngle < maxTraversableSlope && lastJumpedTime + 0.15f < lastJumpRequestTime) {
+        if (((isGrounded && slopeAngle < maxTraversableSlope) || overrideCanJump) && lastJumpedTime + 0.15f < lastJumpRequestTime) {
             PerformJump();
             return true;
         }
@@ -139,10 +139,10 @@ public class AdvancedMoveController : MovementController
     private void ApplyJumpForce(Vector3 jumpForce)
     {
         // Reset vertical velocity for consistent jump heights
+        onJumpPerformed.Invoke();
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddRelativeForce(jumpForce, ForceMode.Impulse);
         ApplyJumpSquashEffect();
-        onJumpPerformed.Invoke();
     }
 
     /// <summary>

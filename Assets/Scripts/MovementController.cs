@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Core movement functionality for physics-based characters.
@@ -22,7 +23,9 @@ public class MovementController : MonoBehaviour
     protected Collider mainCollider;
 	protected Animator animator;
     protected Vector3 baseModelScale;
-	public Vector3 CurrentVelocity { get => rb != null ? rb.velocity : Vector3.zero; }
+    public bool overrideCanJump { get; set; } = false;
+
+    public Vector3 CurrentVelocity { get => rb != null ? rb.velocity : Vector3.zero; }
     public static int AnimationID_DistanceToTarget = Animator.StringToHash("DistanceToTarget");
     public static int AnimationID_IsGrounded = Animator.StringToHash("Grounded");
     public static int AnimationID_YVelocity = Animator.StringToHash("YVelocity");

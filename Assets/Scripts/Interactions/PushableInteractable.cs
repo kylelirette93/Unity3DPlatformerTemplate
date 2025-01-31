@@ -16,7 +16,7 @@ public class PushableInteractable : Interactable
     private float defaultPlayerRotationSpeed;
     private void OnJointBreak(float breakForce)
     {
-        Debug.Log($"JOINT BROKE! FORCE {breakForce}");
+        //Debug.Log($"JOINT BROKE! FORCE {breakForce}");
         if (currentInteractor != null)
             currentInteractor.EndCurrentInteraction();
     }
@@ -31,6 +31,10 @@ public class PushableInteractable : Interactable
         movementController = controller.GetComponent<MovementController>();
         if (movementController)
         {
+            movementController.overrideCanJump = true;
+            if (movementController is AdvancedMoveController) {
+                (movementController as AdvancedMoveController).onJumpPerformed.AddListener(PusherJumped);
+            }
             defaultPlayerRotationSpeed = movementController.rotationSpeed;
             movementController.rotationSpeed = 0;
         }
@@ -39,6 +43,9 @@ public class PushableInteractable : Interactable
         return true;
     }
 
+    protected void PusherJumped() {
+        if (currentInteractor) OnInteractionEnd(currentInteractor);
+    }
     /// <summary>
     /// Overrides the base attachment to add break force limits to the joint.
     /// </summary>
@@ -63,6 +70,10 @@ public class PushableInteractable : Interactable
         
         // Restore player's original rotation speed
         if (movementController != null) {
+            movementController.overrideCanJump = false;
+            if (movementController is AdvancedMoveController) {
+                (movementController as AdvancedMoveController).onJumpPerformed.RemoveListener(PusherJumped);
+            }
             movementController.rotationSpeed = defaultPlayerRotationSpeed;
             movementController = null;
         }
