@@ -28,3 +28,5 @@ This template includes the settings and assets you need to start creating with t
 # Known Issues:
 
 - Enemy is dying instantly when hit instead of taking multiple hits (obbeying health).
+- FluidZone is not applying drag to the player.
+- IcyZone not implemented yet.

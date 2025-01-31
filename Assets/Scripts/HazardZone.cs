@@ -36,9 +36,6 @@ public class HazardZone : MonoBehaviour
     [Tooltip("Cooldown between hits")]
     [SerializeField] private float cooldown = 0.0f;
 
-    [Tooltip("If enabled, applies constant upward force while in trigger (useful for wind/updraft effects)")]
-    [SerializeField] private bool applyContinuousForce;
-
     [Header("Collision Detection")]
     [Tooltip("How the hazard should detect objects")]
     [SerializeField] private HazardDetection DetectionMethod = HazardDetection.ColliderEnter;
@@ -63,6 +60,7 @@ public class HazardZone : MonoBehaviour
 
     private void OnCollisionStay(Collision other)
     {
+        if (other.collider.isTrigger) return;
         if (DetectionMethod.isDetectionMethodSet(HazardDetection.ColliderEnter) || !DetectionMethod.isDetectionMethodSet(HazardDetection.ColliderContinuous)) return;
 
         AttemptApplyDamageAndKnockback(other.collider);
@@ -74,6 +72,7 @@ public class HazardZone : MonoBehaviour
     /// </summary>
     private void OnTriggerStay(Collider other)
     {
+        if (other.isTrigger) return;
         if (DetectionMethod.isDetectionMethodSet(HazardDetection.TriggerEnter) || !DetectionMethod.isDetectionMethodSet(HazardDetection.TriggerContinuous)) return;
 
         AttemptApplyDamageAndKnockback(other);
@@ -81,6 +80,7 @@ public class HazardZone : MonoBehaviour
 
     private void AttemptApplyDamageAndKnockback(Collider other)
     {
+        if (other.isTrigger) return;
         if (other.attachedRigidbody == null || !IsVulnerable(other.tag)) {
             return;
         }
@@ -108,6 +108,7 @@ public class HazardZone : MonoBehaviour
     /// </summary>
     private void OnCollisionEnter(Collision collision)
     {
+        if (collision.collider.isTrigger) return;
         if (!DetectionMethod.isDetectionMethodSet(HazardDetection.ColliderEnter) || DetectionMethod.isDetectionMethodSet(HazardDetection.ColliderContinuous)) return;
         
         if (IsVulnerable(collision.gameObject.tag)) {
@@ -121,6 +122,7 @@ public class HazardZone : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
+        if (other.isTrigger) return;
         if (!DetectionMethod.isDetectionMethodSet(HazardDetection.TriggerEnter) || DetectionMethod.isDetectionMethodSet(HazardDetection.TriggerContinuous)) return;
 
         if (IsVulnerable(other.tag)) {

@@ -4,7 +4,6 @@ using UnityEngine;
 /// Handles the "explosion" effect of an object by detaching and propelling its child objects outward.
 /// Commonly used for breaking objects into pieces or spawning collectibles.
 /// </summary>
-[RequireComponent(typeof(Rigidbody))]
 public class ExplosionSpawner : MonoBehaviour 
 {
     [Header("Explosion Settings")]
@@ -66,8 +65,8 @@ public class ExplosionSpawner : MonoBehaviour
             if (fragment.TryGetComponent<Rigidbody>(out var rigidbody))
             {
                 Vector3 explosionDirection = fragment.position - transform.position;
-                rigidbody.AddForce(explosionDirection * explosionForce, ForceMode.Force);
-                rigidbody.AddTorque(Random.insideUnitSphere * explosionForce, ForceMode.Force);
+                rigidbody.AddForce(explosionDirection * explosionForce, ForceMode.Impulse);
+                rigidbody.AddTorque(Random.insideUnitSphere * explosionForce, ForceMode.Impulse);
             }
         }
     }
