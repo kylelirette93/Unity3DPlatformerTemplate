@@ -99,40 +99,56 @@ public class PrefabCreatorTool : EditorWindow
             Directory.CreateDirectory(outputPath);
         }
 
+        int amountPrefabs = 0;
         foreach (GameObject sourceModel in sourceModels)
         {
             // Create new instance of the model
             GameObject instance = Instantiate(sourceModel);
-            
+            if (instance.transform.childCount == 1)
+            {
+                var child = instance.transform.GetChild(0);
+                child.SetParent(instance.transform.parent);
+                DestroyImmediate(instance);
+                instance = child.gameObject;
+            }
+
+            if (instance.TryGetComponent<MeshRenderer>(out MeshRenderer mr))
+                HandleMeshRenderer(mr);
             // Add mesh colliders to all mesh renderers
             foreach (MeshRenderer meshRenderer in instance.GetComponentsInChildren<MeshRenderer>())
             {
-                // Get the mesh filter attached to the same object as the mesh renderer
-                MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
-                if (meshFilter != null && meshFilter.sharedMesh != null)
-                {
-                    // Add mesh collider if it doesn't exist
-                    if (!meshRenderer.gameObject.GetComponent<MeshCollider>())
-                    {
-                        MeshCollider collider = meshRenderer.gameObject.AddComponent<MeshCollider>();
-                        collider.sharedMesh = meshFilter.sharedMesh;
-                    }
-                    
-                    // Set material
-                    meshRenderer.sharedMaterial = selectedMaterial;
-                }
+                HandleMeshRenderer(meshRenderer);
             }
 
             // Create prefab
-            string prefabPath = Path.Combine(outputPath, sourceModel.name + "_Prefab.prefab");
+            string prefabPath = Path.Combine(outputPath, sourceModel.name + ".prefab");
             prefabPath = AssetDatabase.GenerateUniqueAssetPath(prefabPath);
             PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
-            
+            amountPrefabs++;
+
             // Clean up instance
             DestroyImmediate(instance);
         }
 
         AssetDatabase.Refresh();
-        EditorUtility.DisplayDialog("Success", "Prefabs created successfully!", "OK");
+        EditorUtility.DisplayDialog("Success", $"{amountPrefabs} prefabs created successfully!", "OK");
+    }
+
+    private void HandleMeshRenderer(MeshRenderer meshRenderer)
+    {
+        // Get the mesh filter attached to the same object as the mesh renderer
+        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
+        if (meshFilter != null && meshFilter.sharedMesh != null)
+        {
+            // Add mesh collider if it doesn't exist
+            if (!meshRenderer.gameObject.GetComponent<MeshCollider>())
+            {
+                MeshCollider collider = meshRenderer.gameObject.AddComponent<MeshCollider>();
+                collider.sharedMesh = meshFilter.sharedMesh;
+            }
+
+            // Set material
+            meshRenderer.sharedMaterial = selectedMaterial;
+        }
     }
 }

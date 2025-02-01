@@ -25,7 +25,7 @@ public class HazardZone : MonoBehaviour
     [SerializeField] private int damageAmount = 1;
     
     [Tooltip("Tags of entities that can be affected by this hazard. Leave empty to affect all objects")]
-    [SerializeField] private string[] vulnerableTags = { "Player" };
+    [SerializeField, TagDropdown] private string[] vulnerableTags = { "Player" };
 
     [Tooltip("Collides with objects in the invulnerable layer (Turn off if you want the player to dash through this without colliding)")]
     [SerializeField] private bool collidesWithInvulnerable = true;

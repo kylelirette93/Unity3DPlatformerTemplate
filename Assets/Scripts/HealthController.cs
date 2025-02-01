@@ -31,6 +31,7 @@ public class HealthController : MonoBehaviour
     [Tooltip("Seconds to wait before respawn (if respawning)")]
     public float respawnAfterSeconds = 1.5f;
     [Tooltip("Object tags that won't cause collision damage to this object")]
+	[TagDropdown]
 	public string[] ignoredCollisionTags;
 
 	[Header("Damage Visual Effects")]

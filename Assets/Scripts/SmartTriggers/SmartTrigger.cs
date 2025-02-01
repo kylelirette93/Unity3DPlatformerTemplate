@@ -34,10 +34,10 @@ public class SmartTrigger : MonoBehaviour
     [SerializeField] private string[] triggerTags;
 
     [Tooltip("Actions to execute when the trigger activates")]
-    [SerializeField] private List<TriggerAction> onTriggerActions = new List<TriggerAction>();
+    [SerializeReference] public List<TriggerAction> onTriggerActions = new List<TriggerAction>();
 
     [Tooltip("Actions to execute when the trigger deactivates (only used with UntriggerOtherwise option)")]
-    [SerializeField] private List<TriggerAction> onUntriggerActions = new List<TriggerAction>();
+    [SerializeReference] public List<TriggerAction> onUntriggerActions = new List<TriggerAction>();
 
     private bool hasAlreadyTriggered;
     private HashSet<Collider> triggeredColliders = new HashSet<Collider>();
@@ -51,6 +51,10 @@ public class SmartTrigger : MonoBehaviour
     }
     public void SetTriggerListElement(int indx, TriggerAction newAction)
     {
+        if (indx >= onTriggerActions.Count)
+        {
+            onTriggerActions.Add(newAction);
+        }
         onTriggerActions[indx] = newAction;
     }
     public TriggerAction GetTriggerListElement(int indx)

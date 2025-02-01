@@ -19,7 +19,6 @@ using System.Collections.Generic;
 /// 3. Configure buoyancy and drag settings
 /// 4. Optionally add splash sounds
 /// </remarks>
-[RequireComponent(typeof(BoxCollider))]
 public class FluidZone : MonoBehaviour 
 {
     [Header("Fluid Effects")]
@@ -46,28 +45,6 @@ public class FluidZone : MonoBehaviour
     /// </summary>
     private Dictionary<GameObject, (float linear, float angular)> originalDragValues 
         = new Dictionary<GameObject, (float linear, float angular)>();
-    
-    /// <summary>
-    /// Validates component requirements and settings on startup
-    /// </summary>
-    void Awake()
-    {
-        ValidateSetup();
-    }
-    
-    /// <summary>
-    /// Ensures proper tag and trigger settings
-    /// </summary>
-    private void ValidateSetup()
-    {
-        if (!CompareTag("Water"))
-        {
-            tag = "Water";
-            Debug.LogWarning($"FluidZone on {gameObject.name} requires 'Water' tag. Tag has been added.", this);
-        }
-        
-        GetComponent<Collider>().isTrigger = true;
-    }
     
     /// <summary>
     /// Applies continuous buoyancy force to objects in the fluid

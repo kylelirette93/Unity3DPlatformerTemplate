@@ -52,7 +52,6 @@ public class Checkpoint : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         
         collider.isTrigger = true;
-        tag = "Respawn";
     }
     
     private void ValidateConfiguration()

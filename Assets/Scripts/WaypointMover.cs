@@ -73,8 +73,7 @@ public class WaypointMover : MonoBehaviour
     {
         foreach (Transform child in transform)
         {
-            if (child.CompareTag("Waypoint"))
-            {
+            if (child.CompareTag("Waypoint")) {
                 waypoints.Add(child);
             }
         }
