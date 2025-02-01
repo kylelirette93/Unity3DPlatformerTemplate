@@ -14,7 +14,10 @@ public class Coin : MonoBehaviour
 	[Tooltip("Distance at which the coin is automatically collected")]
 	public float pickupDistance = 1f;
 
-	[Header("Animation")]
+    [Tooltip("Amount of coins to grant the player for picking it up.")]
+    public int pickupAmount = 1;
+
+    [Header("Animation")]
 	[Tooltip("Base rotation speed and direction")]
 	public Vector3 baseRotationSpeed = new Vector3(0, 80, 0);
 	[Tooltip("Additional rotation when attracting to player")]
@@ -95,7 +98,7 @@ public class Coin : MonoBehaviour
 			AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 		}
 		
-		GameManager.Instance.CoinsCollected++;
+		GameManager.Instance.CoinsCollected += pickupAmount;
 		
 		Destroy(gameObject);
 	}

@@ -83,7 +83,7 @@ public class PrefabCreatorTool : EditorWindow
 
         EditorGUILayout.Space();
 
-        GUI.enabled = sourceModels.Count > 0 && selectedMaterial != null;
+        GUI.enabled = sourceModels.Count > 0;
         if (GUILayout.Button("Create Prefabs"))
         {
             CreatePrefabs();
@@ -148,7 +148,8 @@ public class PrefabCreatorTool : EditorWindow
             }
 
             // Set material
-            meshRenderer.sharedMaterial = selectedMaterial;
+            if (selectedMaterial != null)
+                meshRenderer.sharedMaterial = selectedMaterial;
         }
     }
 }
