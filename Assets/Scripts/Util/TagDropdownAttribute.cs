@@ -1,5 +1,2 @@
 using UnityEngine;
-public class TagDropdownAttribute : PropertyAttribute
-{
-
-}
+public class TagDropdownAttribute : PropertyAttribute { }

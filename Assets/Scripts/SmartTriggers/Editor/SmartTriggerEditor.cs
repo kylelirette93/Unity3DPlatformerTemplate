@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Reflection;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine.UIElements;
 
 [CustomEditor(typeof(SmartTrigger))]
 public class SmartTriggerEditor : Editor
@@ -18,7 +19,7 @@ public class SmartTriggerEditor : Editor
 
     private void OnEnable()
     {
-        optionsProperty = serializedObject.FindProperty("options");
+        optionsProperty = serializedObject.FindProperty("triggerOptions");
         triggerLayersProperty = serializedObject.FindProperty("triggerLayers");
         triggerTagsProperty = serializedObject.FindProperty("triggerTags");
         SerializedProperty triggerListProperty = serializedObject.FindProperty("onTriggerActions");
@@ -37,33 +38,14 @@ public class SmartTriggerEditor : Editor
         triggerList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) => {
             var element = triggerList.serializedProperty.GetArrayElementAtIndex(index);
 
-            // Adjust rect to create space between elements
-            //rect.y += 2;
-            //rect.height = EditorGUIUtility.singleLineHeight;
-
-            //// Draw the property field with full property height
-            //EditorGUI.PropertyField(rect, element, new GUIContent(element.managedReferenceValue != null ? element.managedReferenceValue.ToString() : "Null"));
-
-
-            //// Create a temporary SerializedObject for the list element
             SerializedObject elementSerializedObject = element.serializedObject;
 
             elementSerializedObject.Update();
-            //// Begin the drawing of the element
+            
             EditorGUI.BeginProperty(rect, GUIContent.none, element);
 
-            //EditorGUI.LabelField(rect, element.managedReferenceValue != null ? element.managedReferenceValue.ToString() : "Null");
-            //// Indent the property field
-            //EditorGUI.indentLevel++;
-            //rect = EditorGUI.IndentedRect(rect);
-            // Draw the default inspector for the element
             EditorGUI.PropertyField(rect, element, new GUIContent(element.managedReferenceValue != null ? element.managedReferenceValue.ToString() : "Null"), true);
-            //EditorGUI.indentLevel--;
-            // Get the actual object reference
-
-            // Draw the default inspector for the element
-            //EditorGUI.PropertyField(rect, element, GUIContent.none);
-
+            
             //// Apply the changes to the SerializedObject
             elementSerializedObject.ApplyModifiedProperties();
 
@@ -102,9 +84,20 @@ public class SmartTriggerEditor : Editor
 
         untriggerList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) => {
             var element = untriggerList.serializedProperty.GetArrayElementAtIndex(index);
-            rect.y += 2;
-            rect.height = EditorGUIUtility.singleLineHeight;
-            EditorGUI.PropertyField(rect, element, GUIContent.none, true);
+
+            SerializedObject elementSerializedObject = element.serializedObject;
+
+            elementSerializedObject.Update();
+
+            EditorGUI.BeginProperty(rect, GUIContent.none, element);
+
+            EditorGUI.PropertyField(rect, element, new GUIContent(element.managedReferenceValue != null ? element.managedReferenceValue.ToString() : "Null"), true);
+
+            //// Apply the changes to the SerializedObject
+            elementSerializedObject.ApplyModifiedProperties();
+
+            //// End the drawing of the element
+            EditorGUI.EndProperty();
         };
 
         untriggerList.elementHeightCallback = (int index) => {
@@ -133,29 +126,14 @@ public class SmartTriggerEditor : Editor
         ((SmartTrigger)target).SetTriggerListElement(triggerList.serializedProperty.arraySize, newInstance);
 
         serializedObject.Update();
-
-        //var index = triggerList.serializedProperty.arraySize;
-        //triggerList.serializedProperty.InsertArrayElementAtIndex(index);
-        //var element = triggerList.serializedProperty.GetArrayElementAtIndex(index);
-
-        //element.managedReferenceValue = newInstance;
-
-        //serializedObject.ApplyModifiedProperties();
     }
 
-    private void addClickHandlerUntrigger(object target)
+    private void addClickHandlerUntrigger(object t)
     {
-        var addType = (Type)target;
-        serializedObject.Update();
-
-        var index = untriggerList.serializedProperty.arraySize;
-        untriggerList.serializedProperty.InsertArrayElementAtIndex(index);
-        var element = untriggerList.serializedProperty.GetArrayElementAtIndex(index);
-
+        var addType = (Type)t;
         var newInstance = System.Activator.CreateInstance(addType) as TriggerAction;
-        element.managedReferenceValue = newInstance;
-
-        serializedObject.ApplyModifiedProperties();
+        ((SmartTrigger)target).SetUnTriggerListElement(untriggerList.serializedProperty.arraySize, newInstance);
+        serializedObject.Update();
     }
 
     public List<Type> GetListOfTypesInheritingTriggerAction<T>()
@@ -173,16 +151,23 @@ public class SmartTriggerEditor : Editor
 
     public override void OnInspectorGUI()
     {
+
         serializedObject.Update();
 
-        EditorGUILayout.PropertyField(optionsProperty);
+        optionsProperty.intValue = EditorGUI.MaskField(EditorGUILayout.GetControlRect(), new GUIContent("Options"), optionsProperty.intValue, optionsProperty.enumNames);
+
+        serializedObject.ApplyModifiedProperties();
+
+        serializedObject.Update();
         EditorGUILayout.PropertyField(triggerLayersProperty);
         EditorGUILayout.PropertyField(triggerTagsProperty);
+
 
         EditorGUILayout.Space();
         if (triggerList != null) triggerList.DoLayoutList();
 
-        if ((((TriggerOptions)optionsProperty.intValue) & (TriggerOptions.UntriggerOtherwise)) == TriggerOptions.UntriggerOtherwise)
+        TriggerOptions enumFlagsProperty = (TriggerOptions)optionsProperty.enumValueFlag;
+        if ((enumFlagsProperty.HasFlag(TriggerOptions.UntriggerOtherwise)))
         {
             EditorGUILayout.Space();
             untriggerList.DoLayoutList();

@@ -7,15 +7,16 @@ using System.Linq;
 /// <summary>
 /// A flexible trigger system that can execute a sequence of actions based on various trigger conditions.
 /// </summary>
-[Flags]
+[System.Flags]
 public enum TriggerOptions
 {
-    None = 0,
     TriggerOnlyOnce = 1,        // The trigger will only execute its actions once
     TriggerWhenEnter = 2,       // Execute when objects enter the trigger
     TriggerWhenExit = 4,        // Execute when objects exit the trigger
     TriggerWhileInside = 8,     // Continuously execute while objects are inside
-    UntriggerOtherwise = 16     // Execute untrigger actions when no valid objects are inside
+    UntriggerOtherwise = 16,     // Execute untrigger actions when no valid objects are inside
+    RequiresMinWeight = 32,
+    HasCooldown = 64
 }
 
 /// <summary>
@@ -25,13 +26,19 @@ public enum TriggerOptions
 public class SmartTrigger : MonoBehaviour
 {
     [Tooltip("Configure how and when the trigger should activate")]
-    [SerializeField] private TriggerOptions options;
+    [SerializeField] private TriggerOptions triggerOptions;
 
     [Tooltip("Which layers can activate this trigger")]
     [SerializeField] private LayerMask triggerLayers;
 
+    [Tooltip("Cooldown between activations of this trigger")]
+    [SerializeField] private float cooldownBeforeReactivation = 0.0f;
+
+    [Tooltip("Weight required to activate this trigger")]
+    [SerializeField] private float requiredWeight = 0.0f;
+
     [Tooltip("Which tags can activate this trigger (leave empty to accept any tag)")]
-    [SerializeField] private string[] triggerTags;
+    [SerializeField][TagDropdown] private string[] triggerTags;
 
     [Tooltip("Actions to execute when the trigger activates")]
     [SerializeReference] public List<TriggerAction> onTriggerActions = new List<TriggerAction>();
@@ -41,6 +48,7 @@ public class SmartTrigger : MonoBehaviour
 
     private bool hasAlreadyTriggered;
     private HashSet<Collider> triggeredColliders = new HashSet<Collider>();
+    public List<Rigidbody> triggeredRigidbodies = new List<Rigidbody>();
 
     protected bool hasAnyTriggerActions { get => onTriggerActions.Count > 0; }
     protected bool hasAnyUntriggerActions { get => onUntriggerActions.Count > 0; }
@@ -57,6 +65,16 @@ public class SmartTrigger : MonoBehaviour
         }
         onTriggerActions[indx] = newAction;
     }
+
+    public void SetUnTriggerListElement(int indx, TriggerAction newAction)
+    {
+        if (indx >= onUntriggerActions.Count)
+        {
+            onUntriggerActions.Add(newAction);
+        }
+        onUntriggerActions[indx] = newAction;
+    }
+
     public TriggerAction GetTriggerListElement(int indx)
     {
         return onTriggerActions[indx];
@@ -67,9 +85,9 @@ public class SmartTrigger : MonoBehaviour
         
         triggeredColliders.Add(other);
 
-        if ((options & TriggerOptions.TriggerWhenEnter) != 0)
+        if ((triggerOptions.HasFlag(TriggerOptions.TriggerWhenEnter)))
         {
-            if (options.HasFlag(TriggerOptions.TriggerOnlyOnce) && hasAlreadyTriggered) return;
+            if (triggerOptions.HasFlag(TriggerOptions.TriggerOnlyOnce) && hasAlreadyTriggered) return;
             ExecuteTriggerActions();
         }
     }
@@ -80,13 +98,13 @@ public class SmartTrigger : MonoBehaviour
 
         triggeredColliders.Remove(other);
 
-        if ((options & TriggerOptions.TriggerWhenExit) != 0)
+        if ((triggerOptions.HasFlag(TriggerOptions.TriggerWhenExit)))
         {
-            if (options.HasFlag(TriggerOptions.TriggerOnlyOnce) && hasAlreadyTriggered) return;
+            if (triggerOptions.HasFlag(TriggerOptions.TriggerOnlyOnce) && hasAlreadyTriggered) return;
             ExecuteTriggerActions();
         }
 
-        if (options.HasFlag(TriggerOptions.UntriggerOtherwise) && triggeredColliders.Count == 0)
+        if (triggerOptions.HasFlag(TriggerOptions.UntriggerOtherwise) && triggeredColliders.Count == 0)
         {
             ExecuteUntriggerActions();
         }
@@ -94,9 +112,9 @@ public class SmartTrigger : MonoBehaviour
 
     private void Update()
     {
-        if ((options & TriggerOptions.TriggerWhileInside) != 0 && triggeredColliders.Count > 0)
+        if ((triggerOptions.HasFlag(TriggerOptions.TriggerWhileInside)) && triggeredColliders.Count > 0)
         {
-            if (options.HasFlag(TriggerOptions.TriggerOnlyOnce) && hasAlreadyTriggered) return;
+            if (triggerOptions.HasFlag(TriggerOptions.TriggerOnlyOnce) && hasAlreadyTriggered) return;
             ExecuteTriggerActions();
         }
     }
@@ -107,7 +125,7 @@ public class SmartTrigger : MonoBehaviour
     protected bool IsValidTrigger(Collider other)
     {
         // Check layer
-        if ((triggerLayers.value & (1 << other.gameObject.layer)) == 0)
+        if (!(triggerLayers.isLayerInLayerMask(other.gameObject.layer)))
             return false;
 
         // Check tags
