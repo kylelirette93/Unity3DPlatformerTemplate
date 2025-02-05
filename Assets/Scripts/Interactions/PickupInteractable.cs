@@ -21,6 +21,8 @@ public class PickupInteractable : PhysicsInteractable
     [Conditional("InteractHoldingTossesObject",false)]
     public TriggerActionsList onTriggerActions = new TriggerActionsList();
     
+    public static int PickedUpObjectLayer {get; private set;} = -1;
+    int originalLayer = 0;
     private void OnJointBreak(float breakForce)
     {
         Debug.Log("JOINT BROKE!");
@@ -28,10 +30,24 @@ public class PickupInteractable : PhysicsInteractable
             currentInteractor.EndCurrentInteraction();
     }
 
+    protected override void AttachToController<T>(InteractionController controller)
+    {
+        if (gameObject.layer != PickedUpObjectLayer)
+            originalLayer = gameObject.layer;
+        gameObject.layer = PickedUpObjectLayer;
+        base.AttachToController<T>(controller);
+    }
+
+    protected override void DetachFromController()
+    {
+        base.DetachFromController();
+        gameObject.layer = originalLayer;
+    }
+
     public override bool OnInteract(InteractionController controller)
     {
         if (!base.OnInteract(controller)) return false;
-
+        if (PickedUpObjectLayer == -1) PickedUpObjectLayer = LayerMask.NameToLayer("PickedUpObject");
         endWithToss = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.mass *= weightMultiplierWhenHeld;
