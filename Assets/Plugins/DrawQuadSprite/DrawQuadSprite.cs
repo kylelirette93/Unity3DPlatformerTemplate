@@ -27,7 +27,7 @@ public static class DrawQuadSprite
     public static void Initialize()
     {
         if (_hasInitialized) return;
-
+        _matProp = new MaterialPropertyBlock();
         colorname = Shader.PropertyToID("_MainColor");
         texturename = Shader.PropertyToID("_BaseMap");
         _drawMaterial = Resources.Load<Material>("QuadTextureMatPropBlock");
@@ -42,6 +42,10 @@ public static class DrawQuadSprite
     public static void DrawSprite(Texture2D t2d, Vector3 pos) => DrawSprite(t2d, pos, Vector3.one);
 
     public static void DrawSprite(Texture2D t2d, Vector3 pos, Vector3 scale) {
+        if (_quadMesh == null || _drawMaterial == null || _matProp == null) {
+            _hasInitialized = false;
+            Initialize();
+        }
         //_matProp = new MaterialPropertyBlock();
         _matProp.SetColor("_MainColor", new Color(1.0f,1.0f,1.0f,1.0f));
         _matProp.SetTexture("_BaseMap", t2d);

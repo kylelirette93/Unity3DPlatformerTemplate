@@ -185,6 +185,8 @@ public class AdvancedMoveController : MovementController
     /// <returns>True if character is considered grounded</returns>
     private bool CheckGroundContact()
     {
+        if (gameObject == null || GameManager.IsQuittingGame) return false;
+
         float dist = mainCollider.bounds.extents.y;
         int groundHitsFound = Physics.SphereCastNonAlloc(
             transform.TransformPoint(((CapsuleCollider)mainCollider).center),
