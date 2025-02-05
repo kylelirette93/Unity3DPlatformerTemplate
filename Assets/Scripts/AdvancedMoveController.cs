@@ -10,6 +10,8 @@ using UnityEngine.Events;
 public class AdvancedMoveController : MovementController
 {
     [Header("Ground Detection")]
+    [Tooltip("Maximum stair step that the character can climb")]
+    public float maxStepClimbable = 2.0f;
     [Tooltip("Maximum slope angle (in degrees) that the character can traverse")]
     public float maxTraversableSlope = 40f;
     [Tooltip("Speed at which the character slides down non-traversable slopes")]
@@ -58,6 +60,7 @@ public class AdvancedMoveController : MovementController
     public int jumpChainCount { get; private set; }
     public int bounceComboCount { get; set; } = 0;
 
+    private float lastTimeTookStep;
     private Vector3 slideDirection = Vector3.zero;
     private float slideDuration = 0f;
     private RaycastHit[] groundHits = new RaycastHit[4];
@@ -83,7 +86,7 @@ public class AdvancedMoveController : MovementController
         ApplyVelocityControl(currentFriction, maxVelocity + platformVelocity.magnitude, true);
 
         // Handle landing and buffered jumps
-        if (isGrounded && !wasGrounded)
+        if (isGrounded && !wasGrounded && lastTimeTookStep.HasTimeElapsedSince(0.2f))
         {
             if (landAudio)
                 landAudio.PlaySound(transform.position);
@@ -195,8 +198,7 @@ public class AdvancedMoveController : MovementController
 
         platformVelocity = Vector3.zero;
         
-        for (int i = 0; i < groundHitsFound; i++)
-        {
+        for (int i = 0; i < groundHitsFound; i++) {
             RaycastHit hit = groundHits[i];
             
             // Slope handling
@@ -237,7 +239,31 @@ public class AdvancedMoveController : MovementController
                     ForceMode.VelocityChange
                 );
             }
-
+            
+            Vector3 foundGroundPos = hit.point;
+            // Attempt find stairs'
+            if (lastReceivedMovementDirection.magnitude > 0.15f && lastTimeTookStep.HasTimeElapsedSince(0.25f)) {
+                groundHitsFound = Physics.SphereCastNonAlloc(
+                    transform.TransformPoint(((CapsuleCollider)mainCollider).center + Vector3.up * 0.25f) + lastReceivedMovementDirection.SetY(0).normalized * ((CapsuleCollider)mainCollider).radius * 1.42f,
+                    ((CapsuleCollider)mainCollider).radius * 0.4f,
+                    Vector3.down,
+                    groundHits,
+                    dist * 0.33f,
+                    GameManager.Instance.groundMask,
+                    QueryTriggerInteraction.Ignore
+                );
+                for (int z = 0; z < groundHitsFound; z++)
+                {
+                    float stepDifference = groundHits[z].point.y - foundGroundPos.y;
+                    
+                    if (stepDifference > 0.04f && stepDifference < maxStepClimbable)
+                    {
+                        rb.AddForce(Vector3.up *stepDifference * 14.5f, ForceMode.Impulse);
+                        lastTimeTookStep = Time.time;
+                        break;
+                    }
+                }
+            }
             return true;
         }
 

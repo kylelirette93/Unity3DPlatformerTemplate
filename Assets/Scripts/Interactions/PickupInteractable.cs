@@ -4,7 +4,7 @@ using UnityEngine;
 /// Represents an object that can be picked up and thrown by the player.
 /// The object will be held above the player's head and can be thrown in the direction they're facing.
 /// </summary>
-public class PickupInteractable : Interactable
+public class PickupInteractable : PhysicsInteractable
 {
     [Tooltip("How much lighter the object becomes when held (0.3 means 30% of original mass)")]
     [SerializeField] private float weightMultiplierWhenHeld = 0.3f;
@@ -12,7 +12,15 @@ public class PickupInteractable : Interactable
     [Tooltip("Additional height above the player's head to hold the object")]
     [SerializeField] private float holdHeight = 0.5f;
 
+    [Space(3)]
+    [Tooltip("If set to true pressing the interact button while holding the object wil toss it.")]
+    [SerializeField, ToggleLeft]private bool InteractHoldingTossesObject = true;
 
+    [Tooltip("Actions to execute when using interaction button while holding")]
+    [SerializeReference]
+    [Conditional("InteractHoldingTossesObject",false)]
+    public TriggerActionsList onTriggerActions = new TriggerActionsList();
+    
     private void OnJointBreak(float breakForce)
     {
         Debug.Log("JOINT BROKE!");
@@ -24,6 +32,7 @@ public class PickupInteractable : Interactable
     {
         if (!base.OnInteract(controller)) return false;
 
+        endWithToss = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.mass *= weightMultiplierWhenHeld;
         
@@ -38,6 +47,22 @@ public class PickupInteractable : Interactable
         return true;
     }
 
+    public override void OnInteractedAlreadyInteracting(InteractionController controller)
+    {
+        base.OnInteractedAlreadyInteracting(controller);
+        if (InteractHoldingTossesObject) {
+            endWithToss = true;
+            OnInteractionEnd(controller);
+        }
+        else {
+            if (!onTriggerActions.isExecutingList) {
+                onTriggerActions.ExecuteTriggerActions(this);
+            }
+        }
+    }
+
+    bool endWithToss = false;
+
     public override void OnInteractionEnd(InteractionController controller)
     {
         if (currentInteractor == null) return;
@@ -46,8 +71,11 @@ public class PickupInteractable : Interactable
         rb.interpolation = defaultInterpolation;
         rb.mass /= weightMultiplierWhenHeld;
         
-        rb.AddRelativeForce(controller.ThrowForce, ForceMode.VelocityChange);
-
+        if (endWithToss)
+            rb.AddRelativeForce(controller.ThrowForce, ForceMode.VelocityChange);
+        else {
+            rb.AddRelativeForce(new Vector3(0, 1, 2), ForceMode.VelocityChange);
+        }
         base.OnInteractionEnd(controller);
     }
 
