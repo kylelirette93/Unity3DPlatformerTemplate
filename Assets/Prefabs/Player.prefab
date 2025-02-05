@@ -89,11 +89,11 @@ MonoBehaviour:
   Friction: 9
   SquashEffect: {x: 1.4, y: 0.6, z: 1.4}
   StretchEffect: {x: 0.6, y: 1.4, z: 0.6}
-  SquashAndStretchRecoverSpeed: 5
-  maxStepClimbable: 2
+  SquashAndStretchRecoverSpeed: 6
+  maxStepClimbable: 3
   maxTraversableSlope: 40
   slideSpeed: 42
-  platformGripForce: 0
+  platformGripForce: 6.9
   stompDamage: 1
   airRotationSpeed: 0.38
   airAcceleration: 18
