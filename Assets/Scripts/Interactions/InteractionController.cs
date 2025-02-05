@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(PlayerController))]
@@ -53,16 +54,37 @@ public class InteractionController : MonoBehaviour
 
     Vector3 lastInteractablePosition = Vector3.zero;
     float interactableSize = 0f;
-    private void LateUpdate() {
-        if (interactablesInRange.Count > 0 && interactableButtonTexture != null) {
-            interactableSize = Mathf.Clamp(interactableSize + Time.deltaTime * 2.6f, 0.0f,1.0f);
+    private void LateUpdate()
+    {
+        RemoveInvalidEntriesFromInteractablesList();
+
+        DrawButtonHintForInteractables();
+    }
+
+    private void DrawButtonHintForInteractables()
+    {
+        if (interactablesInRange.Count > 0 && interactableButtonTexture != null && currentInteractable == null)
+        {
+            interactableSize = Mathf.Clamp(interactableSize + Time.deltaTime * 2.6f, 0.0f, 1.0f);
             lastInteractablePosition = interactablesInRange[0].transform.position;
-        } else {
-            interactableSize = Mathf.Clamp(interactableSize - Time.deltaTime * 4.2f, 0.0f,1.0f);
+        }
+        else
+        {
+            interactableSize = Mathf.Clamp(interactableSize - Time.deltaTime * 4.2f, 0.0f, 1.0f);
         }
 
-        if (interactableSize > 0.01f) {   
+        if (interactableSize > 0.01f)
+        {
             DrawQuadSprite.DrawSprite(interactableButtonTexture, lastInteractablePosition + Vector3.up * Mathf.Sin(Time.time * 4.25f) * 0.125f, Vector3.one * interactableSize);
+        }
+    }
+
+    private void RemoveInvalidEntriesFromInteractablesList()
+    {
+        // Remove any invalid entries in our list.
+        for (int i = interactablesInRange.Count - 1; i >= 0; i--)
+        {
+            if (interactablesInRange[i] == null) interactablesInRange.RemoveAt(i);
         }
     }
 
