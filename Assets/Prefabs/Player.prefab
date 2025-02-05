@@ -86,13 +86,13 @@ MonoBehaviour:
   rotationSpeed: 1.8
   maxVelocity: 9
   Acceleration: 70
-  Friction: 7.6
+  Friction: 9
   SquashEffect: {x: 1.4, y: 0.6, z: 1.4}
   StretchEffect: {x: 0.6, y: 1.4, z: 0.6}
   SquashAndStretchRecoverSpeed: 5
   maxTraversableSlope: 40
   slideSpeed: 42
-  platformGripForce: 7.7
+  platformGripForce: 0
   stompDamage: 1
   airRotationSpeed: 0.38
   airAcceleration: 18
