@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,10 +15,14 @@ public class AdvancedMoveController : MovementController
     public float maxStepClimbable = 2.0f;
     [Tooltip("Maximum slope angle (in degrees) that the character can traverse")]
     public float maxTraversableSlope = 40f;
+    [Tooltip("Maximum slope angle (in degrees) that the character is considered grounded")]
+    public float maxGroundedSlope = 65f;
     [Tooltip("Speed at which the character slides down non-traversable slopes")]
     public float slideSpeed = 42f;
     [Tooltip("Force multiplier to maintain position on moving platforms")]
     public float platformGripForce = 7.7f;
+    [Tooltip("Extra height to add to ground check")]
+    public float extraGroundingHeightCheck = 0.1f;
 
     [Header("Combat")]
     [Tooltip("Damage applied when jumping on an enemy")]
@@ -64,6 +69,7 @@ public class AdvancedMoveController : MovementController
     private Vector3 slideDirection = Vector3.zero;
     private float slideDuration = 0f;
     private RaycastHit[] groundHits = new RaycastHit[4];
+    private RaycastHit[] doubleCheckHits = new RaycastHit[2];
     private bool wasGrounded;
     private Vector3 lastReceivedMovementDirection;
 
@@ -93,9 +99,10 @@ public class AdvancedMoveController : MovementController
 
             ApplyLandingSquashEffect();
             onLandingPerformed.Invoke();
-            if (lastJumpRequestTime + jumpBufferTime > Time.time) {
-                PerformJump();
-            }
+        }
+
+        if (timeGrounded > 0.05f && isGrounded && lastJumpRequestTime + jumpBufferTime + 0.05f > Time.time) {
+            RequestJump(true);
         }
         
         wasGrounded = isGrounded;
@@ -105,10 +112,11 @@ public class AdvancedMoveController : MovementController
     /// Processes jump input request and initiates jump if conditions are met.
     /// Stores jump request time for jump leniency feature.
     /// </summary>
-    public bool RequestJump()
+    public bool RequestJump(bool fromLeniancyTimer = false)
     {
         lastJumpRequestTime = Time.time;
-        if (((isGrounded && slopeAngle < maxTraversableSlope) || overrideCanJump) && lastJumpedTime + 0.15f < lastJumpRequestTime) {
+        if (((timeGrounded > 0.08f && slopeAngle < maxTraversableSlope) || overrideCanJump) && lastJumpedTime + 0.15f < lastJumpRequestTime) {
+
             PerformJump();
             return true;
         }
@@ -123,6 +131,7 @@ public class AdvancedMoveController : MovementController
         // Prevent jumping too close together from last jump.
         if (lastJumpedTime + 0.15f > Time.time)
             return;
+        lastJumpRequestTime = -50.0f;
         lastJumpedTime = Time.time;
         jumpChainCount = (timeGrounded < chainJumpWindow) ? 
             Mathf.Min(2, jumpChainCount + 1) : 0;
@@ -178,6 +187,7 @@ public class AdvancedMoveController : MovementController
         }
     }
 
+    GameObject lastColliderGroundedHit;
     /// <summary>
     /// Performs ground detection using SphereCast and handles slope/platform interactions.
     /// Uses multiple raycasts to ensure accurate ground detection and smooth movement.
@@ -187,10 +197,12 @@ public class AdvancedMoveController : MovementController
     {
         if (gameObject == null || GameManager.IsQuittingGame) return false;
 
-        float dist = mainCollider.bounds.extents.y;
+        
+        float dist = mainCollider.bounds.extents.y + extraGroundingHeightCheck;
+        Vector3 raycastfromCenterPosition = transform.TransformPoint(((CapsuleCollider)mainCollider).center);
         int groundHitsFound = Physics.SphereCastNonAlloc(
-            transform.TransformPoint(((CapsuleCollider)mainCollider).center),
-            ((CapsuleCollider)mainCollider).radius,
+            raycastfromCenterPosition,
+            ((CapsuleCollider)mainCollider).radius * 0.9f,
             Vector3.down,
             groundHits,
             dist * 0.33f,
@@ -203,8 +215,17 @@ public class AdvancedMoveController : MovementController
         for (int i = 0; i < groundHitsFound; i++) {
             RaycastHit hit = groundHits[i];
             
+            Debug.DrawLine(hit.point, hit.point +  hit.normal, Color.red);
+            lastColliderGroundedHit = hit.collider.gameObject;
+            bool potentiallyGrounded = true;
+            
             // Slope handling
             slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+
+
+            if (slopeAngle > maxGroundedSlope) {
+                potentiallyGrounded = false;
+            }
             if (slopeAngle > maxTraversableSlope && hit.transform.tag != "Pushable")
             {
                 slideDuration += Time.deltaTime * 0.22f;
@@ -228,6 +249,7 @@ public class AdvancedMoveController : MovementController
                 gameObject.ApplyDamageAndKnockback(enemy.gameObject, stompDamage, 0f, 0f);
                 bounceComboCount += 1;
                 ApplyJumpForce(enemy.playerBounceForce + (new Vector3(0f, 1.5f, 0f) * bounceComboCount));
+                potentiallyGrounded = false;
             } else {
                 bounceComboCount = 0;
             }
@@ -244,29 +266,35 @@ public class AdvancedMoveController : MovementController
             
             Vector3 foundGroundPos = hit.point;
             // Attempt find stairs'
-            if (lastReceivedMovementDirection.magnitude > 0.15f && lastTimeTookStep.HasTimeElapsedSince(0.25f)) {
-                groundHitsFound = Physics.SphereCastNonAlloc(
-                    transform.TransformPoint(((CapsuleCollider)mainCollider).center + Vector3.up * 0.25f) + lastReceivedMovementDirection.SetY(0).normalized * ((CapsuleCollider)mainCollider).radius * 1.42f,
-                    ((CapsuleCollider)mainCollider).radius * 0.4f,
-                    Vector3.down,
-                    groundHits,
-                    dist * 0.33f,
-                    GameManager.Instance.groundMask,
-                    QueryTriggerInteraction.Ignore
-                );
-                for (int z = 0; z < groundHitsFound; z++)
-                {
-                    float stepDifference = groundHits[z].point.y - foundGroundPos.y;
-                    
-                    if (stepDifference > 0.04f && stepDifference < maxStepClimbable)
+            if (potentiallyGrounded && lastReceivedMovementDirection.magnitude > 0.15f && lastTimeTookStep.HasTimeElapsedSince(0.25f) && !GameManager.IsQuittingGame) {
+                Vector3 RaycastdownInFrontPosition = transform.TransformPoint(((CapsuleCollider)mainCollider).center + Vector3.up * 0.25f) + lastReceivedMovementDirection.SetY(0).normalized * ((CapsuleCollider)mainCollider).radius * 1.42f;
+                // Check if there's a wall in front of me between the new raycast down and avoid doing further checks if there is.
+                if (!Physics.Linecast(raycastfromCenterPosition, raycastfromCenterPosition, GameManager.Instance.groundMask, QueryTriggerInteraction.Ignore)) {
+                    // No wall found so let's try to find a step within the acceptable limits.
+                    groundHitsFound = Physics.SphereCastNonAlloc(
+                        RaycastdownInFrontPosition,
+                        ((CapsuleCollider)mainCollider).radius * 0.4f,
+                        Vector3.down,
+                        groundHits,
+                        dist * 0.33f,
+                        GameManager.Instance.groundMask,
+                        QueryTriggerInteraction.Ignore
+                    );
+                    for (int z = 0; z < groundHitsFound; z++)
                     {
-                        rb.AddForce(Vector3.up *stepDifference * 14.5f, ForceMode.Impulse);
-                        lastTimeTookStep = Time.time;
-                        break;
+                        float stepDifference = groundHits[z].point.y - foundGroundPos.y;
+                        
+                        if (stepDifference > 0.04f && stepDifference < maxStepClimbable)
+                        {
+                            rb.AddForce(Vector3.up *stepDifference * 14.5f, ForceMode.Impulse);
+                            lastTimeTookStep = Time.time;
+                            break;
+                        }
                     }
                 }
             }
-            return true;
+            if (potentiallyGrounded)
+                return true;
         }
 
         return false;
