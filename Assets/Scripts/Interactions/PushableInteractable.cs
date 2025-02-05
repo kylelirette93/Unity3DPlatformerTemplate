@@ -42,6 +42,11 @@ public class PushableInteractable : PhysicsInteractable
         AttachToController<FixedJoint>(controller);
         return true;
     }
+    public override void OnInteractedAlreadyInteracting(InteractionController controller)
+    {
+        base.OnInteractedAlreadyInteracting(controller);
+        PusherJumped();
+    }
 
     protected void PusherJumped() {
         if (currentInteractor) OnInteractionEnd(currentInteractor);
