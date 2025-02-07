@@ -25,7 +25,7 @@ public enum TriggerOptions
     TriggerOnSpawn = 32,
     TriggerOnCollide = 64,  // Execute on collider enter
     HasCooldown = 128,
-    RequiresMinWeight = 256,
+    RequiresMinWeight = 512,
     TriggerOnlyOnce = 1024,        // The trigger will only execute its actions once
     UntriggeringInterruptsExecution = 2056,
 }
@@ -181,7 +181,7 @@ public class SmartTrigger : MonoBehaviour
     {
         if (other.isTrigger) return false;
         if (!IsValidTrigger(other)) return false;
-        Debug.Log($"Processing collider {other} {other.gameObject} has player controller? {other.GetComponent<PlayerController>() != null}", other);
+        //Debug.Log($"Processing collider {other} {other.gameObject} has player controller? {other.GetComponent<PlayerController>() != null}", other);
         triggeredColliders.Add(other);
 
         // Track rigidbody for weight calculation
