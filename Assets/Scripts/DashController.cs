@@ -231,7 +231,7 @@ public class DashController : MonoBehaviour
         if (moveController != null && !moveController.enabled)
         {
             moveController.Update();
-            moveController.AlignWithDirection(dashDirection, 8.5f, true, true);
+            moveController.AlignWithDirection(dashDirection.normalized, 8.5f, true, true);
         }
 
         // Reduce gravity if dashing in air

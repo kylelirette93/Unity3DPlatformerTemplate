@@ -11,10 +11,12 @@ public class PhysicsInteractable : Interactable
     protected Rigidbody rb;
     protected RigidbodyInterpolation defaultInterpolation;
     protected Joint physicsJoint;
+    protected float originalMass;
     protected override void Awake()
     {
         base.Awake();
         TryGetComponent(out rb);
+        originalMass = rb.mass;
         defaultInterpolation = rb.interpolation;
     }
 
