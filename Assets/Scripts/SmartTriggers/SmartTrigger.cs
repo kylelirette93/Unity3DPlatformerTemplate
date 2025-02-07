@@ -25,7 +25,7 @@ public enum TriggerOptions
     TriggerOnSpawn = 32,
     TriggerOnCollide = 64,  // Execute on collider enter
     HasCooldown = 128,
-    RequiresMinWeight = 512,
+    RequiresMinWeight = 256,
     TriggerOnlyOnce = 1024,        // The trigger will only execute its actions once
     UntriggeringInterruptsExecution = 2056,
 }
