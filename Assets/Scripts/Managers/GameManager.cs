@@ -39,12 +39,15 @@ public class GameManager : Singleton<GameManager>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void StartedWithoutGameManager()
     {
+        IsQuittingGame = false;
         Instance.Initialize();
     }
+
 
     public void Initialize()
     {
         Debug.Log("GameManager Initialized");
+        CheckpointManager.ClearSceneHashCache();
     }
 
     // Start is called before the first frame update
