@@ -85,7 +85,7 @@ public class PickupInteractable : PhysicsInteractable
 
         DetachFromController();
         rb.interpolation = defaultInterpolation;
-        rb.mass /= weightMultiplierWhenHeld;
+        rb.mass = originalMass;
         
         if (endWithToss)
             rb.AddRelativeForce(controller.ThrowForce, ForceMode.VelocityChange);
