@@ -144,6 +144,7 @@ MonoBehaviour:
   Sounds:
   - {fileID: 8300000, guid: 3fb29c1bba77bc241b6773c798e74949, type: 3}
   - {fileID: 8300000, guid: 8cc3c83d12bfb00469d9b2851abd7fa9, type: 3}
+  - {fileID: 8300000, guid: 2d5c1fd80aaddbc42835820ef7717be8, type: 3}
   Music: 0
   RandomPitch: 1
   RandomPitchMin: 0.95
