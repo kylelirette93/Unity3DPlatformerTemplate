@@ -89,22 +89,13 @@ MonoBehaviour:
   Friction: 9
   SquashEffect: {x: 1.4, y: 0.6, z: 1.4}
   StretchEffect: {x: 0.6, y: 1.4, z: 0.6}
-<<<<<<< Updated upstream
   SquashAndStretchRecoverSpeed: 6
   maxStepClimbable: 3
-=======
-  SquashAndStretchRecoverSpeed: 5
-  maxStepClimbable: 2
->>>>>>> Stashed changes
   maxTraversableSlope: 40
   maxGroundedSlope: 65
   slideSpeed: 42
-<<<<<<< Updated upstream
   platformGripForce: 6.9
-=======
-  platformGripForce: 0
   extraGroundingHeightCheck: 0.1
->>>>>>> Stashed changes
   stompDamage: 1
   airRotationSpeed: 0.38
   airAcceleration: 18
@@ -115,8 +106,9 @@ MonoBehaviour:
   - {x: 0, y: 15, z: 6}
   chainJumpWindow: 0.1
   jumpBufferTime: 0.17
-  jumpAudio: {fileID: 0}
-  landAudio: {fileID: 0}
+  groundedTimeBeforeJump: 0.12
+  jumpAudio: {fileID: 8300000, guid: 7c07da37253443b44b7d65394d06740a, type: 3}
+  landAudio: {fileID: 8300000, guid: e8732cefcbd21c54ea9a1b65f945bfc0, type: 3}
   onJumpPerformed:
     m_PersistentCalls:
       m_Calls: []
@@ -135,8 +127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec4bae2fdf1b14a4b8cd3547e8a7e0d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionAudioClip: {fileID: 0}
-  damageAudioClip: {fileID: 0}
+  collisionAudioClip: {fileID: 8300000, guid: a443e5029184aed4aa0068b6600c84c9, type: 3}
+  damageAudioClip: {fileID: 8300000, guid: 8a430fc7352c86547af883a2a201b54a, type: 3}
   deathAudioClip: {fileID: 0}
   health: 20
   takesCollisionDamageFromRigidbodies: 0
@@ -171,15 +163,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionZone: {fileID: 100018}
   interactionRadius: 0.5
-<<<<<<< Updated upstream
   interactableButtonTexture: {fileID: 2800000, guid: e2f1960f9f69cd44598490a6220153a6,
     type: 3}
-=======
-  interactableButtonTexture: {fileID: 0}
->>>>>>> Stashed changes
   throwForce: {x: 0, y: 5, z: 7}
-  interactSound: {fileID: 0}
-  releaseSound: {fileID: 0}
+  interactSound: {fileID: 8300000, guid: 3fb29c1bba77bc241b6773c798e74949, type: 3}
+  releaseSound: {fileID: 8300000, guid: 8cc3c83d12bfb00469d9b2851abd7fa9, type: 3}
   armsAnimationLayer: 1
 --- !u!136 &2400076769302071918
 CapsuleCollider:
@@ -263,7 +251,7 @@ MonoBehaviour:
   dashDuration: 0.3
   dashCooldown: 1
   airDashUpwardsForce: 0.5
-  dashAudio: {fileID: 0}
+  dashAudio: {fileID: 8300000, guid: 6e44c005ffe7f4147bb4893ee10fd978, type: 3}
   dashParticles: {fileID: 0}
   dashInvulnerability: 1
   dashCurve:
@@ -351,11 +339,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-<<<<<<< Updated upstream
   dashTrailColor: {r: 0.55722225, g: 0.41870406, b: 0.81886786, a: 1}
-=======
-  dashTrailColor: {r: 0, g: 0, b: 0, a: 0}
->>>>>>> Stashed changes
 --- !u!1 &100018
 GameObject:
   m_ObjectHideFlags: 0

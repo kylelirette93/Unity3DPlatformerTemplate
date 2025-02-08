@@ -127,6 +127,7 @@ MonoBehaviour:
   enableChasing: 1
   ignoreHeight: 1
   minTargetDistance: 0.7
+  collidesWithInvulnerable: 0
   visionSensor: {fileID: 11400004}
   attackSensor: {fileID: 11400006}
 --- !u!114 &5347145844791443438
@@ -142,10 +143,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collisionAudioClip: {fileID: 0}
-  damageAudioClip: {fileID: 0}
+  damageAudioClip: {fileID: 8300000, guid: ac25a782f7f4fe74ebcdb51598026c98, type: 3}
   deathAudioClip: {fileID: 0}
   health: 4
-  takesCollisionDamage: 1
+  takesCollisionDamageFromRigidbodies: 0
+  takesCollisionDamageFromStaticbodies: 0
   minCollisionDamageVelocity: 0.2
   shouldRespawn: 0
   respawnAfterSeconds: 1.5

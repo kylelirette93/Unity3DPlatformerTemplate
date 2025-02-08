@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followTarget: {fileID: 0}
-  cameraOffset: {x: 0, y: 3.5, z: 7}
+  cameraOffset: {x: 0, y: 2, z: 5}
   positionLerpSpeed: 6
   orbitSpeed: 100
   lookAtSpeed: 100
