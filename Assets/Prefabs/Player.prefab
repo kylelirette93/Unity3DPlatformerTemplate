@@ -249,7 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dashSpeed: 20
   dashDuration: 0.3
-  dashCooldown: 1
+  dashCooldown: 0.7
   airDashUpwardsForce: 0.5
   dashAudio: {fileID: 8300000, guid: 6e44c005ffe7f4147bb4893ee10fd978, type: 3}
   dashParticles: {fileID: 0}
