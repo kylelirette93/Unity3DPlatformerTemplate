@@ -9599,29 +9599,45 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 7239152914278383619
+      type: {class: DisplayScreenTextAction, ns: , asm: Assembly-CSharp}
+      data:
+        runInParallel: 1
+        textToDisplay: Press R2 to dash!
+        displayDuration: -1
+        textColor: {r: 1, g: 1, b: 1, a: 1}
+        respectTimescale: 0
+    - rid: 7239152914278383632
+      type: {class: UnityEventAction, ns: , asm: Assembly-CSharp}
+      data:
+        runInParallel: 1
+        onExecute:
+          m_PersistentCalls:
+            m_Calls:
+            - m_Target: {fileID: 2120822802}
+              m_TargetAssemblyTypeName: FreezePlayer, Assembly-CSharp
+              m_MethodName: WaitAndDoThing
+              m_Mode: 1
+              m_Arguments:
+                m_ObjectArgument: {fileID: 0}
+                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+                m_IntArgument: 0
+                m_FloatArgument: 0
+                m_StringArgument: 
+                m_BoolArgument: 0
+              m_CallState: 2
+        completionType: 0
+        completionDelay: 0.1
     - rid: 7402537019056062467
       type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
       data:
         list:
-        - rid: 7402537019056062477
-        - rid: 7402537019056062484
+        - rid: 7239152914278383619
+        - rid: 7239152914278383632
     - rid: 7402537019056062468
       type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
       data:
         list: []
-    - rid: 7402537019056062477
-      type: {class: GameObjectToggleAction, ns: , asm: Assembly-CSharp}
-      data:
-        runInParallel: 0
-        targetObject: {fileID: 2120822801}
-        setActive: 1
-    - rid: 7402537019056062484
-      type: {class: DisplayScreenTextAction, ns: , asm: Assembly-CSharp}
-      data:
-        runInParallel: 0
-        textToDisplay: Press R2 to dash!
-        displayDuration: 2
-        textColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!65 &1304713688
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11095,7 +11111,7 @@ PrefabInstance:
     - target: {fileID: 6096182855077146271, guid: 9d33240245f276c47a644786629feebf,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16797,12 +16813,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 304242422}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2120822801 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6096182855077146271, guid: 9d33240245f276c47a644786629feebf,
+--- !u!114 &2120822802 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 61482510051082070, guid: 9d33240245f276c47a644786629feebf,
     type: 3}
   m_PrefabInstance: {fileID: 1759386911}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 664d15febe3846d4ba9275e6661a80aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

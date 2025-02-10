@@ -35,6 +35,7 @@ public class DashController : MonoBehaviour
 
     // Dash state
     private bool isDashing;
+    public bool IsDashing { get => isDashing; }
     private float dashEndTime, dashStartTime;
     private float nextDashTime;
     private Vector3 dashDirection;
