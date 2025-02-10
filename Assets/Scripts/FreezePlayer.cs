@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,11 +17,11 @@ public class FreezePlayer : MonoBehaviour
         transform.SetParent(player.transform);
         // Stop the player from moving.
         playerRb = player.GetComponent<Rigidbody>();
-        playerInput = player.GetComponent<PlayerInput>();
+        
         if (playerRb != null)
         {
             playerRb.constraints = RigidbodyConstraints.FreezeAll;
-            playerInput.enabled = false;
+            Time.timeScale = 0;
             StartCoroutine(ResetPlayer(resetDelay));
         }
         else
@@ -31,9 +32,9 @@ public class FreezePlayer : MonoBehaviour
 
     private IEnumerator ResetPlayer(float delay)
     {
-       yield return new WaitForSeconds(delay);
-       playerRb.constraints = RigidbodyConstraints.None;
+        yield return new WaitForSecondsRealtime(delay);
+        Time.timeScale = 1;
+        playerRb.constraints = RigidbodyConstraints.None;
        playerRb.constraints = RigidbodyConstraints.FreezeRotation;
-       playerInput.enabled = true; 
     }
 }

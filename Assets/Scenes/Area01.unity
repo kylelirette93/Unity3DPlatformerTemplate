@@ -14008,7 +14008,7 @@ MonoBehaviour:
       data:
         runInParallel: 0
         lookAtTarget: {fileID: 2025753637}
-        cameraOffset: {x: 0, y: 2, z: -5}
+        cameraOffset: {x: 0, y: 2, z: 5}
         duration: 1
         transitionSpeed: 1
         stopPlayerInputWhileOverriding: 1
