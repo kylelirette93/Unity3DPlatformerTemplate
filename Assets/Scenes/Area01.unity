@@ -266,6 +266,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
+      propertyPath: activationSound
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
       propertyPath: isInitialCheckpoint
       value: 1
       objectReference: {fileID: 0}
@@ -5949,8 +5953,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
+      propertyPath: activationSound
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
+      propertyPath: activationEffect
+      value: 
+      objectReference: {fileID: 1904769072}
+    - target: {fileID: 11400000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
       propertyPath: onCheckpointActivated.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
       propertyPath: onCheckpointActivated.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -5959,7 +5971,15 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 047951988bf256c4eae577d59ab0b1c8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1487320270}
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 047951988bf256c4eae577d59ab0b1c8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1487320269}
   m_SourcePrefab: {fileID: 100100000, guid: 047951988bf256c4eae577d59ab0b1c8, type: 3}
 --- !u!4 &462719705 stripped
 Transform:
@@ -8359,6 +8379,7 @@ MonoBehaviour:
           joystick to move
         displayDuration: 5
         textColor: {r: 1, g: 1, b: 1, a: 1}
+        respectTimescale: 1
 --- !u!65 &660587939
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11279,6 +11300,7 @@ MonoBehaviour:
         textToDisplay: Each jump in succession is higher!
         displayDuration: 3
         textColor: {r: 0, g: 0.70835805, b: 1, a: 1}
+        respectTimescale: 1
 --- !u!4 &870855456
 Transform:
   m_ObjectHideFlags: 0
@@ -14008,7 +14030,7 @@ MonoBehaviour:
       data:
         runInParallel: 0
         lookAtTarget: {fileID: 2025753637}
-        cameraOffset: {x: 0, y: 2, z: 5}
+        cameraOffset: {x: 0, y: 2, z: 9}
         duration: 1
         transitionSpeed: 1
         stopPlayerInputWhileOverriding: 1
@@ -15449,6 +15471,7 @@ MonoBehaviour:
         textToDisplay: Press X to Jump
         displayDuration: 3
         textColor: {r: 1, g: 1, b: 1, a: 1}
+        respectTimescale: 1
 --- !u!65 &1208436834
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18652,6 +18675,100 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1413393886}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1487320268 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 047951988bf256c4eae577d59ab0b1c8,
+    type: 3}
+  m_PrefabInstance: {fileID: 462719704}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1487320269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487320268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0aae16cee012a84dbc4589bd4574d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerOptions: 514
+  triggerLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  cooldownBeforeReactivation: 0
+  requiredWeight: 0
+  togglableByInteraction: 0
+  triggerTags:
+  - Player
+  onTriggerActions:
+    rid: 7402537049048481795
+  onUntriggerActions:
+    rid: 7402537049048481796
+  references:
+    version: 2
+    RefIds:
+    - rid: 7402537049048481795
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list: []
+    - rid: 7402537049048481796
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list: []
+--- !u!114 &1487320270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487320268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0aae16cee012a84dbc4589bd4574d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerOptions: 2
+  triggerLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  cooldownBeforeReactivation: 0
+  requiredWeight: 0
+  togglableByInteraction: 0
+  triggerTags:
+  - Player
+  onTriggerActions:
+    rid: 7402537049048481792
+  onUntriggerActions:
+    rid: 7402537049048481793
+  references:
+    version: 2
+    RefIds:
+    - rid: 7402537049048481792
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list:
+        - rid: 7402537049048481794
+        - rid: 7402537049048481798
+    - rid: 7402537049048481793
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list: []
+    - rid: 7402537049048481794
+      type: {class: DisplayScreenTextAction, ns: , asm: Assembly-CSharp}
+      data:
+        runInParallel: 0
+        textToDisplay: Checkpoint Activated
+        displayDuration: 2
+        textColor: {r: 1, g: 1, b: 1, a: 1}
+        respectTimescale: 1
+    - rid: 7402537049048481798
+      type: {class: PlaySoundAction, ns: , asm: Assembly-CSharp}
+      data:
+        runInParallel: 1
+        audioClip: {fileID: 8300000, guid: 83577d28f323de84d9fa312c01a61f4d, type: 3}
+        playLocation: {fileID: 0}
 --- !u!1 &1487509125
 GameObject:
   m_ObjectHideFlags: 0
@@ -21743,6 +21860,7 @@ MonoBehaviour:
         textToDisplay: Press Space to Jump
         displayDuration: 3
         textColor: {r: 0, g: 0.70835805, b: 1, a: 1}
+        respectTimescale: 1
 --- !u!4 &1744677241
 Transform:
   m_ObjectHideFlags: 0
@@ -24320,6 +24438,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cc16a7bd3d1d944489abe4f807f4228a, type: 3}
+--- !u!198 &1904769072 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 19800000, guid: 91fd7ffbdf8449a419e1f52cead56924,
+    type: 3}
+  m_PrefabInstance: {fileID: 909630407}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1905930067
 PrefabInstance:
   m_ObjectHideFlags: 0
