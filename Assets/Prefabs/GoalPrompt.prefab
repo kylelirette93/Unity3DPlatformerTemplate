@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &39764463391595417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8411750378233393304}
+  - component: {fileID: 4292078877861899527}
+  - component: {fileID: 3356640800640615804}
+  - component: {fileID: 2295878021291400268}
+  m_Layer: 0
+  m_Name: GoalPrompt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8411750378233393304
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39764463391595417}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.7889206, y: -0.0057003205, z: -142.47}
+  m_LocalScale: {x: 0.95510983, y: 0.48859936, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4292078877861899527
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39764463391595417}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3356640800640615804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39764463391595417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0aae16cee012a84dbc4589bd4574d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerOptions: 514
+  triggerLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  cooldownBeforeReactivation: 0
+  requiredWeight: 0
+  togglableByInteraction: 0
+  triggerTags:
+  - Player
+  onTriggerActions:
+    rid: 7402536995307651104
+  onUntriggerActions:
+    rid: 7402536995307651105
+  references:
+    version: 2
+    RefIds:
+    - rid: 7402536995307651104
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list:
+        - rid: 7402536995307651107
+    - rid: 7402536995307651105
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list: []
+    - rid: 7402536995307651107
+      type: {class: CameraOverrideAction, ns: , asm: Assembly-CSharp}
+      data:
+        runInParallel: 0
+        lookAtTarget: {fileID: 0}
+        cameraOffset: {x: 0, y: 2, z: 9}
+        duration: 1
+        transitionSpeed: 1
+        stopPlayerInputWhileOverriding: 1
+--- !u!114 &2295878021291400268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39764463391595417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0aae16cee012a84dbc4589bd4574d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerOptions: 4
+  triggerLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  cooldownBeforeReactivation: 0
+  requiredWeight: 0
+  togglableByInteraction: 0
+  triggerTags:
+  - Player
+  onTriggerActions:
+    rid: 7402536995307651108
+  onUntriggerActions:
+    rid: 7402536995307651109
+  references:
+    version: 2
+    RefIds:
+    - rid: 7402536995307651108
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list:
+        - rid: 7402536995307651110
+    - rid: 7402536995307651109
+      type: {class: TriggerActionsList, ns: , asm: Assembly-CSharp}
+      data:
+        list: []
+    - rid: 7402536995307651110
+      type: {class: GameObjectToggleAction, ns: , asm: Assembly-CSharp}
+      data:
+        runInParallel: 0
+        targetObject: {fileID: 39764463391595417}
+        setActive: 0
