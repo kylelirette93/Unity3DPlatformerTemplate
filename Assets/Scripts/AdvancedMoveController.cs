@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Extends basic MovementController with advanced features for character movement.
@@ -53,6 +54,26 @@ public class AdvancedMoveController : MovementController
     [Tooltip("Sound effect played when landing")]
     public AudioClip landAudio;
 
+    [Header("Wall Climb Settings")]
+    [Tooltip("The speed at which the player climbs the wall")]
+    public float wallClimbSpeed = 5f;
+    [Tooltip("The stamina drain per second while climbing")]
+    public float climbStaminaDrain = 10f;
+    [Tooltip("The stamina regen per second while climbing")]
+    public float climbStaminaRegen = 10f;
+    [Tooltip("Minimum stamina required to initiate a climb")]
+    public float minClimbStamina = 10f;
+
+    private float wallCheckDistance = 0.6f;
+    private float wallAngleThreshold = 90f;
+    private float climbStamina = 100f;
+    private bool isClimbing;
+    private bool isAgainstWall = false;
+
+    public PlayerInput playerInput;
+    InputAction climbAction;
+    
+
     [Header("Events")]
     public UnityEvent onJumpPerformed = new UnityEvent();
     public UnityEvent onLandingPerformed = new UnityEvent();
@@ -81,14 +102,38 @@ public class AdvancedMoveController : MovementController
     /// Updates ground detection and movement parameters. Should be called in FixedUpdate.
     /// Handles ground detection, slope interactions, and jump leniency timing.
     /// </summary>
+
+    
+
+    protected override void Awake()
+    {
+        base.Awake();
+        climbAction = playerInput.actions["Climb"];
+    }
     public void UpdateMovement()
     {
         isGrounded = CheckGroundContact();
+        isAgainstWall = CheckWallContact();
         timeGrounded = isGrounded ? timeGrounded + Time.deltaTime : 0f;
 
         // Update movement parameters based on ground state, lerping so landing isn't so jarring if input direction isn't zero.
         float desiredFriction = isGrounded ? Friction : airFriction;
         currentFriction = Mathf.Lerp(currentFriction, desiredFriction, Time.deltaTime * (desiredFriction < currentFriction || lastReceivedMovementDirection.magnitude < 0.05f ? 18f : 2.82f));
+
+        // Handle wall climbing
+        if (isAgainstWall && climbAction.WasPressedThisFrame() && climbStamina >= minClimbStamina)
+        {
+            StartWallClimb();
+        }
+
+        if (isClimbing)
+        {
+            HandleWallClimb();
+        }
+        else
+        {
+            RegenerateStamina();
+        }
 
         // Apply movement controls
         ApplyVelocityControl(currentFriction, maxVelocity + platformVelocity.magnitude, true);
@@ -105,6 +150,12 @@ public class AdvancedMoveController : MovementController
 
         if (timeGrounded > 0.05f && isGrounded && lastJumpRequestTime + jumpBufferTime + 0.05f > Time.time) {
             RequestJump(true);
+        }
+
+        // Regenerate stamina when grounded.
+        if (isGrounded)
+        {
+            climbStamina = Mathf.Min(100f, climbStamina + climbStaminaRegen * Time.deltaTime);
         }
         
         wasGrounded = isGrounded;
@@ -300,6 +351,62 @@ public class AdvancedMoveController : MovementController
         }
 
         return false;
+    }
+
+    private bool CheckWallContact()
+    {
+        RaycastHit hit;
+        Vector3 direction = transform.forward;
+        Vector3 rayCastPosition = transform.position + Vector3.up * mainCollider.bounds.extents.y;
+
+        if (Physics.Raycast(rayCastPosition, direction, out hit, wallCheckDistance))
+        {
+            float angle = Vector3.Angle(hit.normal, Vector3.up);
+
+            if (angle > wallAngleThreshold)
+            {
+                Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.green);
+                return true;
+            }
+        }
+
+        Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.red);
+        return false;
+    }
+
+    private void StartWallClimb()
+    {
+        if (climbStamina < minClimbStamina) return;
+
+        isClimbing = true;
+        rb.velocity = Vector3.zero;
+    }
+
+    private void HandleWallClimb()
+    {
+        rb.velocity = new Vector3(0, wallClimbSpeed, 0);
+
+        climbStamina -= climbStaminaDrain * Time.deltaTime;
+
+        if (climbStamina <= 0 || !climbAction.IsPressed() || !isAgainstWall)
+        {
+            StopWallClimb();
+        }
+    }
+
+    private void StopWallClimb()
+    {
+        isClimbing = false;
+        rb.velocity = Vector3.zero; // Stop climbing movement
+    }
+
+    private void RegenerateStamina()
+    {
+        // Regenerate stamina when not climbing
+        if (!isClimbing && climbStamina < 100f)
+        {
+            climbStamina = Mathf.Min(100f, climbStamina + climbStaminaRegen * Time.deltaTime);
+        }
     }
 
     /// <summary>

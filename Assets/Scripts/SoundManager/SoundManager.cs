@@ -22,7 +22,6 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-using UnityEditor.SceneManagement;
 
 /// <summary>
 /// Soundmanager helps

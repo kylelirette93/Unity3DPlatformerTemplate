@@ -16,6 +16,8 @@ public class GameManager : Singleton<GameManager>
     public LayerMask enemyMask;
     [Tooltip("Layers that contain players")]
     public LayerMask playerMask;
+    [Tooltip("Layers that contain walls")]
+    public LayerMask wallMask;
 
     private int _coinsCollected;
     public int CoinsCollected {get => _coinsCollected;
@@ -58,6 +60,8 @@ public class GameManager : Singleton<GameManager>
 
         if (creationFailed)
             return;
+
+        wallMask = LayerMask.GetMask("Wall");
         SoundManager.Init();
         Application.quitting += OnQuitting;
         TryGetComponent(out playerInputManager);
