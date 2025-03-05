@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -56,22 +57,19 @@ public class AdvancedMoveController : MovementController
 
     [Header("Wall Climb Settings")]
     [Tooltip("The speed at which the player climbs the wall")]
-    public float wallClimbSpeed = 5f;
+    public float wallClimbSpeed = 50f;
     [Tooltip("The stamina drain per second while climbing")]
     public float climbStaminaDrain = 10f;
     [Tooltip("The stamina regen per second while climbing")]
-    public float climbStaminaRegen = 10f;
+    public float climbStaminaRegen = 1f;
     [Tooltip("Minimum stamina required to initiate a climb")]
     public float minClimbStamina = 10f;
 
     private float wallCheckDistance = 0.6f;
-    private float wallAngleThreshold = 90f;
+    private float wallAngleThreshold = 89.999f;
     private float climbStamina = 100f;
     private bool isClimbing;
     private bool isAgainstWall = false;
-
-    public PlayerInput playerInput;
-    InputAction climbAction;
     
 
     [Header("Events")]
@@ -108,7 +106,6 @@ public class AdvancedMoveController : MovementController
     protected override void Awake()
     {
         base.Awake();
-        climbAction = playerInput.actions["Climb"];
     }
     public void UpdateMovement()
     {
@@ -119,21 +116,6 @@ public class AdvancedMoveController : MovementController
         // Update movement parameters based on ground state, lerping so landing isn't so jarring if input direction isn't zero.
         float desiredFriction = isGrounded ? Friction : airFriction;
         currentFriction = Mathf.Lerp(currentFriction, desiredFriction, Time.deltaTime * (desiredFriction < currentFriction || lastReceivedMovementDirection.magnitude < 0.05f ? 18f : 2.82f));
-
-        // Handle wall climbing
-        if (isAgainstWall && climbAction.WasPressedThisFrame() && climbStamina >= minClimbStamina)
-        {
-            StartWallClimb();
-        }
-
-        if (isClimbing)
-        {
-            HandleWallClimb();
-        }
-        else
-        {
-            RegenerateStamina();
-        }
 
         // Apply movement controls
         ApplyVelocityControl(currentFriction, maxVelocity + platformVelocity.magnitude, true);
@@ -174,6 +156,19 @@ public class AdvancedMoveController : MovementController
             return true;
         }
         return false;
+    }
+
+    public void RequestClimb()
+    {
+        if (climbStamina >= minClimbStamina && isAgainstWall)
+        {
+            Debug.Log("Starting climb.");
+            HandleWallClimb();
+        }
+        else
+        {
+            RegenerateStamina();
+        }
     }
 
     /// <summary>
@@ -359,12 +354,12 @@ public class AdvancedMoveController : MovementController
         Vector3 direction = transform.forward;
         Vector3 rayCastPosition = transform.position + Vector3.up * mainCollider.bounds.extents.y;
 
-        if (Physics.Raycast(rayCastPosition, direction, out hit, wallCheckDistance))
+        if (Physics.Raycast(rayCastPosition, direction, out hit, wallCheckDistance, GameManager.Instance.wallMask))
         {
             float angle = Vector3.Angle(hit.normal, Vector3.up);
 
-            if (angle > wallAngleThreshold)
-            {
+            if (angle >= wallAngleThreshold)
+            {               
                 Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.green);
                 return true;
             }
@@ -374,21 +369,14 @@ public class AdvancedMoveController : MovementController
         return false;
     }
 
-    private void StartWallClimb()
-    {
-        if (climbStamina < minClimbStamina) return;
-
-        isClimbing = true;
-        rb.velocity = Vector3.zero;
-    }
-
     private void HandleWallClimb()
     {
+        isClimbing = true;
         rb.velocity = new Vector3(0, wallClimbSpeed, 0);
 
         climbStamina -= climbStaminaDrain * Time.deltaTime;
 
-        if (climbStamina <= 0 || !climbAction.IsPressed() || !isAgainstWall)
+        if (climbStamina <= 0 || !isAgainstWall)
         {
             StopWallClimb();
         }
@@ -396,6 +384,7 @@ public class AdvancedMoveController : MovementController
 
     private void StopWallClimb()
     {
+        Debug.Log("Stopping wall climb.");
         isClimbing = false;
         rb.velocity = Vector3.zero; // Stop climbing movement
     }
@@ -422,5 +411,10 @@ public class AdvancedMoveController : MovementController
                 rb.velocity = Vector3.zero;
             }
         }
+    }
+
+    private void FixedUpdate()
+    {
+        Debug.Log(climbStamina);
     }
 } 

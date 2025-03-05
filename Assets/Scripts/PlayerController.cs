@@ -104,7 +104,8 @@ public class PlayerController : MonoBehaviour
 
     void OnClimb()
     {
-        moveController.RequestClimb();
+        if (!GameManager.Instance.IsShowingPauseMenu)
+            moveController.RequestClimb();
     }
 
     void OnMove(InputValue inputVal)
