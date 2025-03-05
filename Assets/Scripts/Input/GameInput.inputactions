@@ -70,12 +70,12 @@
                 },
                 {
                     "name": "Climb",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "9b750734-52f6-4983-a64c-f069dbddf1c3",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -553,26 +553,26 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "68077c52-7dcb-47ed-8733-ce684ed92fc6",
-                    "path": "<Joystick>/stick/up",
+                    "name": "2D Vector Keyboard",
+                    "id": "edd04a35-49b3-44a5-a24b-b6df1720a602",
+                    "path": "2DVector",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
+                    "groups": "",
                     "action": "Climb",
-                    "isComposite": false,
+                    "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "cb0539b8-d152-409f-b200-da8387df1692",
+                    "name": "up",
+                    "id": "c74c506a-92e7-4fb9-a009-2b56dd649509",
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "Climb",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 }
             ]
         }

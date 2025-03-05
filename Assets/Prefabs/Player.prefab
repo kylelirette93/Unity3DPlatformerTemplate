@@ -109,11 +109,10 @@ MonoBehaviour:
   groundedTimeBeforeJump: 0.12
   jumpAudio: {fileID: 8300000, guid: 7c07da37253443b44b7d65394d06740a, type: 3}
   landAudio: {fileID: 8300000, guid: e8732cefcbd21c54ea9a1b65f945bfc0, type: 3}
-  wallClimbSpeed: 5
+  wallClimbSpeed: 3
   climbStaminaDrain: 10
   climbStaminaRegen: 10
   minClimbStamina: 10
-  playerInput: {fileID: -5442971658099831192}
   onJumpPerformed:
     m_PersistentCalls:
       m_Calls: []

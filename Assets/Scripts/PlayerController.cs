@@ -102,10 +102,7 @@ public class PlayerController : MonoBehaviour
             Destroy(CameraFollower.gameObject);
     }
 
-    void OnClimb()
-    {
-        moveController.RequestClimb();
-    }
+   
 
     void OnMove(InputValue inputVal)
     {
