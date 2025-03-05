@@ -62,7 +62,7 @@ public class SoundGroup : MonoBehaviour {
     /// </summary>
 	void OnEnable () {
         //If there isn't any sounds in our array we can't play anything, return this to the pool.
-		if(Sounds.Length==0) {
+		if(Sounds == null || Sounds.Length == 0) {
             if (mAudio != null && mAudio.clip != null)
             {
                 Sounds = new AudioClip[] { mAudio.clip };
