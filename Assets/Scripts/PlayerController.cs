@@ -102,11 +102,7 @@ public class PlayerController : MonoBehaviour
             Destroy(CameraFollower.gameObject);
     }
 
-    void OnClimb()
-    {
-        if (!GameManager.Instance.IsShowingPauseMenu)
-            moveController.RequestClimb();
-    }
+   
 
     void OnMove(InputValue inputVal)
     {

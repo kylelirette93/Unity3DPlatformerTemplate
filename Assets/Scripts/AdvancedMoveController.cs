@@ -57,7 +57,7 @@ public class AdvancedMoveController : MovementController
 
     [Header("Wall Climb Settings")]
     [Tooltip("The speed at which the player climbs the wall")]
-    public float wallClimbSpeed = 50f;
+    public float wallClimbSpeed = 2f;
     [Tooltip("The stamina drain per second while climbing")]
     public float climbStaminaDrain = 10f;
     [Tooltip("The stamina regen per second while climbing")]
@@ -130,6 +130,16 @@ public class AdvancedMoveController : MovementController
             onLandingPerformed.Invoke();
         }
 
+        if (climbStamina >= minClimbStamina && isAgainstWall && Input.GetKey(KeyCode.W))
+        {
+            Debug.Log("Starting climb.");
+            HandleWallClimb();
+        }
+        else
+        {
+            RegenerateStamina();
+        }
+
         if (timeGrounded > 0.05f && isGrounded && lastJumpRequestTime + jumpBufferTime + 0.05f > Time.time) {
             RequestJump(true);
         }
@@ -158,18 +168,7 @@ public class AdvancedMoveController : MovementController
         return false;
     }
 
-    public void RequestClimb()
-    {
-        if (climbStamina >= minClimbStamina && isAgainstWall)
-        {
-            Debug.Log("Starting climb.");
-            HandleWallClimb();
-        }
-        else
-        {
-            RegenerateStamina();
-        }
-    }
+    
 
     /// <summary>
     /// Executes the jump with appropriate force based on consecutive jump count.
@@ -359,11 +358,24 @@ public class AdvancedMoveController : MovementController
             float angle = Vector3.Angle(hit.normal, Vector3.up);
 
             if (angle >= wallAngleThreshold)
-            {               
+            {
                 Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.green);
                 return true;
             }
+            else
+            {
+                Debug.Log("Wall Contact: False, Angle too low: " + angle);
+            }
         }
+        else
+        {
+            if (isClimbing && rb.velocity.y > 0)
+            {
+                GrabLedge();
+            }
+            Debug.Log("Wall Contact: False, Raycast Missed.");
+        }
+    
 
         Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.red);
         return false;
@@ -380,6 +392,11 @@ public class AdvancedMoveController : MovementController
         {
             StopWallClimb();
         }
+    }
+
+    private void GrabLedge()
+    {
+        // TODO: Implement ledge grabbing logic.
     }
 
     private void StopWallClimb()
@@ -413,8 +430,4 @@ public class AdvancedMoveController : MovementController
         }
     }
 
-    private void FixedUpdate()
-    {
-        Debug.Log(climbStamina);
-    }
 } 
