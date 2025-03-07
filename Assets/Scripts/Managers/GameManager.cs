@@ -20,15 +20,16 @@ public class GameManager : Singleton<GameManager>
     public LayerMask wallMask;
 
     private int _coinsCollected;
-    public int CoinsCollected {get => _coinsCollected;
-        set { 
+    public int CoinsCollected { get => _coinsCollected;
+        set {
             // Whenever we set the Coins Colected amount we should update the UI.
             if (_coinsCollected != value) {
-                    _coinsCollected = value;
-                    menuHelper.m_BottomLeftLabel.text = value != 0 ? $"Coins: {value}" : "";
-                }
+                _coinsCollected = value;
+                menuHelper.m_BottomLeftLabel.text = value != 0 ? $"Coins: {value}" : "";
             }
+        }
     }
+    
 
     MenuCreator menuHelper;
     public MenuCreator MenuHelper { get => menuHelper; }

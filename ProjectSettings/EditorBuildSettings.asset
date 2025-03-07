@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/LevelComplete.unity
     guid: 1324f7c2fbcf12241a5181c611f63f15
+  - enabled: 1
+    path: Assets/Scenes/TestScene.unity
+    guid: 47cf9b716e6a42744abd623a9bb06fc1
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 885c5916c7dff26438524d41106c7fbc,
       type: 2}

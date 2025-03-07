@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -68,6 +70,7 @@ public class AdvancedMoveController : MovementController
     private float wallCheckDistance = 0.6f;
     private float wallAngleThreshold = 89.999f;
     private float climbStamina = 100f;
+    public bool IsClimbing { get => isClimbing; }
     private bool isClimbing;
     private bool isAgainstWall = false;
     
@@ -110,7 +113,6 @@ public class AdvancedMoveController : MovementController
     public void UpdateMovement()
     {
         isGrounded = CheckGroundContact();
-        isAgainstWall = CheckWallContact();
         timeGrounded = isGrounded ? timeGrounded + Time.deltaTime : 0f;
 
         // Update movement parameters based on ground state, lerping so landing isn't so jarring if input direction isn't zero.
@@ -130,14 +132,24 @@ public class AdvancedMoveController : MovementController
             onLandingPerformed.Invoke();
         }
 
+        // Check if player is against a wall.
+        isAgainstWall = CheckWallContact();
+
         if (climbStamina >= minClimbStamina && isAgainstWall && Input.GetKey(KeyCode.W))
         {
+            // Begin climbing, if player has enough stamina, is against a wall and holding the climb button.
             Debug.Log("Starting climb.");
+            isClimbing = true;
             HandleWallClimb();
+            // Reduce stamina over time.
+            climbStamina -= climbStaminaDrain * Time.fixedDeltaTime; 
         }
         else
         {
+            isClimbing = false;
             RegenerateStamina();
+            // Ensure gravity is on when not climbing.
+            rb.useGravity = true;
         }
 
         if (timeGrounded > 0.05f && isGrounded && lastJumpRequestTime + jumpBufferTime + 0.05f > Time.time) {
@@ -149,8 +161,27 @@ public class AdvancedMoveController : MovementController
         {
             climbStamina = Mathf.Min(100f, climbStamina + climbStaminaRegen * Time.deltaTime);
         }
-        
+
+        if (isClimbing)
+        {
+            // While climbing, We raycast to check if the player reached the top of the wall, if so smoothly climb over.
+            RaycastHit topCheckHit;
+            Vector3 topCheckPosition = transform.position + transform.forward * 0.2f + Vector3.up * 0.8f; // Adjust offset as needed.
+            if (!Physics.Raycast(topCheckPosition, transform.forward, out topCheckHit, 0.6f)) // Adjust ray length.
+            {
+                Debug.Log("Reached top of wall!");
+                StartCoroutine(SmoothClimbOver(topCheckPosition, 0.3f, 1.5f, 0.7f));
+            }
+        }
         wasGrounded = isGrounded;
+    }
+
+    private void OnDrawGizmos()
+    {
+        // Draw top check ray, adjust offset as needed.
+        Gizmos.color = Color.red;
+        Vector3 topCheckPosition = transform.position + transform.forward * 0.2f + Vector3.up * 1f;
+        Gizmos.DrawRay(topCheckPosition, transform.forward * 0.7f + Vector3.back);
     }
 
     /// <summary>
@@ -349,66 +380,79 @@ public class AdvancedMoveController : MovementController
 
     private bool CheckWallContact()
     {
+        // Draws a raycast in front of the player to check if they are against a wall.
         RaycastHit hit;
         Vector3 direction = transform.forward;
         Vector3 rayCastPosition = transform.position + Vector3.up * mainCollider.bounds.extents.y;
 
         if (Physics.Raycast(rayCastPosition, direction, out hit, wallCheckDistance, GameManager.Instance.wallMask))
         {
-            float angle = Vector3.Angle(hit.normal, Vector3.up);
-
-            if (angle >= wallAngleThreshold)
-            {
-                Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.green);
-                return true;
-            }
-            else
-            {
-                Debug.Log("Wall Contact: False, Angle too low: " + angle);
-            }
+            Debug.DrawRay(rayCastPosition, direction * wallCheckDistance, Color.green);
+            return true;
         }
         else
         {
-            if (isClimbing && rb.velocity.y > 0)
-            {
-                GrabLedge();
-            }
-            Debug.Log("Wall Contact: False, Raycast Missed.");
+            Debug.DrawRay(rayCastPosition, direction * wallCheckDistance, Color.red);
+            return false;
         }
-    
-
-        Debug.DrawRay(transform.position, direction * wallCheckDistance, Color.red);
-        return false;
     }
 
     private void HandleWallClimb()
     {
-        isClimbing = true;
-        rb.velocity = new Vector3(0, wallClimbSpeed, 0);
-
-        climbStamina -= climbStaminaDrain * Time.deltaTime;
-
-        if (climbStamina <= 0 || !isAgainstWall)
+        // Check wall directly in front.
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit))
         {
-            StopWallClimb();
+            // Smoothly move player towards wall, to avoid jittering.
+            rb.position = Vector3.Lerp(rb.position,
+                hit.point + hit.normal * 0.55f,
+                5f * Time.fixedDeltaTime);
+            transform.forward = Vector3.Lerp(transform.forward,
+                -hit.normal,
+                10f * Time.fixedDeltaTime);
+
+            // Move the player up the wall and allow them to move horizontally.
+            float horizontalInput = Input.GetAxisRaw("Horizontal");
+            rb.velocity = transform.right * horizontalInput * wallClimbSpeed;
+            rb.velocity += transform.up * Input.GetAxisRaw("Vertical") * wallClimbSpeed;
+            rb.useGravity = false;
+        }
+        else
+        {
+            // Player is not climbing use gravity.
+            rb.useGravity = true;        
         }
     }
 
-    private void GrabLedge()
-    {
-        // TODO: Implement ledge grabbing logic.
-    }
 
-    private void StopWallClimb()
+    IEnumerator SmoothClimbOver(Vector3 targetPosition, float duration, float additionalHeight = 1.0f, float forwardAmount = 1.0f)
     {
-        Debug.Log("Stopping wall climb.");
-        isClimbing = false;
-        rb.velocity = Vector3.zero; // Stop climbing movement
+        // Debug.Log("Climbing over wall");
+        // Set a timer and start position so we can lerp the player over the wall.
+        float time = 0f;
+        Vector3 startPosition = transform.position;
+
+        // Adjust target position for a higher climb over.
+        Vector3 adjustedTargetPosition = targetPosition + Vector3.up * additionalHeight + transform.forward * forwardAmount;
+
+        while (time < duration)
+        {
+            // Lerp the player over the wall.
+            transform.position = Vector3.Lerp(startPosition, adjustedTargetPosition, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure player is at the correct adjusted position.
+        transform.position = adjustedTargetPosition;
+
+        // Reset the player's velocity to avoid left over momentum.
+        rb.velocity = Vector3.zero;
     }
 
     private void RegenerateStamina()
     {
-        // Regenerate stamina when not climbing
+        // Regenerate stamina when not climbing.
         if (!isClimbing && climbStamina < 100f)
         {
             climbStamina = Mathf.Min(100f, climbStamina + climbStaminaRegen * Time.deltaTime);

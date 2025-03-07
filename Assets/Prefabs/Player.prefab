@@ -99,7 +99,7 @@ MonoBehaviour:
   stompDamage: 1
   airRotationSpeed: 0.38
   airAcceleration: 18
-  airFriction: 1.1
+  airFriction: 1.2
   consecutiveJumpForces:
   - {x: 0, y: 13, z: 0}
   - {x: 0, y: 14, z: 0}
@@ -756,13 +756,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 445712794880070669, guid: 52241262e53495d45952e762d0a06c42,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9727078
+      objectReference: {fileID: 0}
+    - target: {fileID: 445712794880070669, guid: 52241262e53495d45952e762d0a06c42,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 445712794880070669, guid: 52241262e53495d45952e762d0a06c42,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.23203358
+      objectReference: {fileID: 0}
+    - target: {fileID: 445712794880070669, guid: 52241262e53495d45952e762d0a06c42,
+        type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 445712794880070669, guid: 52241262e53495d45952e762d0a06c42,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 26.834
       objectReference: {fileID: 0}
     - target: {fileID: 445712794880070669, guid: 52241262e53495d45952e762d0a06c42,
         type: 3}

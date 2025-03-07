@@ -36,6 +36,7 @@ public class MovementController : MonoBehaviour
     public static int AnimationID_Hurt = Animator.StringToHash("Hurt");
     public static int AnimationID_Attack = Animator.StringToHash("Attack");
     public static int AnimationID_Dash = Animator.StringToHash("Dash");
+	public static int AnimationID_Climbing = Animator.StringToHash("IsClimbing");
 
     protected static PhysicMaterial frictionlessMaterial = null;
 

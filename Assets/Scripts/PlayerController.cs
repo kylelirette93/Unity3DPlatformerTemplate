@@ -183,6 +183,7 @@ public class PlayerController : MonoBehaviour
         characterAnimator.SetFloat(MovementController.AnimationID_DistanceToTarget, moveController.distanceToDestination);
         characterAnimator.SetBool(MovementController.AnimationID_IsGrounded, moveController.isGrounded);
         characterAnimator.SetFloat(MovementController.AnimationID_YVelocity, rb.velocity.y);
+        characterAnimator.SetBool(MovementController.AnimationID_Climbing, moveController.IsClimbing);
     }
 
 } 
