@@ -29,7 +29,22 @@ public class GameManager : Singleton<GameManager>
             }
         }
     }
-    
+
+    private int _stamina;
+    public int Stamina
+    {
+        get => _stamina;
+        set
+        {
+            // Whenever stamina is updated we should update the UI.
+            if (_stamina != value)
+            {
+                _stamina = value;
+                menuHelper.m_BottomRightLabel.text = value != 0 ? $"Stamina: {value}" : "";
+            }
+        }
+    }
+
 
     MenuCreator menuHelper;
     public MenuCreator MenuHelper { get => menuHelper; }

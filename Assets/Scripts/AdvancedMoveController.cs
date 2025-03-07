@@ -57,19 +57,23 @@ public class AdvancedMoveController : MovementController
     [Tooltip("Sound effect played when landing")]
     public AudioClip landAudio;
 
+    [Header("Climb Audio Feedback")]
+    [Tooltip("Sound effect played when climbing")]
+    public AudioClip climbAudio;
+
+
     [Header("Wall Climb Settings")]
     [Tooltip("The speed at which the player climbs the wall")]
     public float wallClimbSpeed = 2f;
     [Tooltip("The stamina drain per second while climbing")]
     public float climbStaminaDrain = 10f;
     [Tooltip("The stamina regen per second while climbing")]
-    public float climbStaminaRegen = 1f;
-    [Tooltip("Minimum stamina required to initiate a climb")]
-    public float minClimbStamina = 10f;
+    public float climbStaminaRegen = 5f;
 
     private float wallCheckDistance = 0.6f;
     private float wallAngleThreshold = 89.999f;
     private float climbStamina = 100f;
+    bool isClimbSoundPlaying = false;
     public bool IsClimbing { get => isClimbing; }
     private bool isClimbing;
     private bool isAgainstWall = false;
@@ -86,6 +90,8 @@ public class AdvancedMoveController : MovementController
     public float timeGrounded { get; private set; }
     public float lastJumpRequestTime { get; private set; } = -50f;
     public float lastJumpedTime { get; private set; } = -50f;
+
+    public float lastTimeClimbed { get; private set; } = -50f;
     public int jumpChainCount { get; private set; }
     public int bounceComboCount { get; set; } = 0;
 
@@ -113,6 +119,10 @@ public class AdvancedMoveController : MovementController
     public void UpdateMovement()
     {
         isGrounded = CheckGroundContact();
+        
+        if (GameManager.Instance != null) 
+        GameManager.Instance.Stamina = (int)climbStamina;
+
         timeGrounded = isGrounded ? timeGrounded + Time.deltaTime : 0f;
 
         // Update movement parameters based on ground state, lerping so landing isn't so jarring if input direction isn't zero.
@@ -122,7 +132,7 @@ public class AdvancedMoveController : MovementController
         // Apply movement controls
         ApplyVelocityControl(currentFriction, maxVelocity + platformVelocity.magnitude, true);
 
-        // Handle landing and buffered jumps
+        // Handle landing, buffered jumps and stamina regen.
         if (isGrounded && !wasGrounded && lastTimeTookStep.HasTimeElapsedSince(0.2f))
         {
             if (landAudio)
@@ -135,19 +145,37 @@ public class AdvancedMoveController : MovementController
         // Check if player is against a wall.
         isAgainstWall = CheckWallContact();
 
-        if (climbStamina >= minClimbStamina && isAgainstWall && Input.GetKey(KeyCode.W))
+        if (climbStamina >= 0 && isAgainstWall && Input.GetKey(KeyCode.W))
         {
             // Begin climbing, if player has enough stamina, is against a wall and holding the climb button.
-            Debug.Log("Starting climb.");
+            // Debug.Log("Starting climb.");
             isClimbing = true;
+            if (!isClimbSoundPlaying && climbAudio)
+            {
+                if (SoundManager.Instance.currentMusic == null)
+                {
+                    PlayClimbSound();
+                }
+                InvokeRepeating("PlayClimbSound", 0f, climbAudio.length); // Schedule the repeats
+                isClimbSoundPlaying = true;
+            }
             HandleWallClimb();
             // Reduce stamina over time.
-            climbStamina -= climbStaminaDrain * Time.fixedDeltaTime; 
+            climbStamina -= climbStaminaDrain * Time.fixedDeltaTime;
         }
         else
         {
+            if (isClimbSoundPlaying) // Reset the flag when climbing stops
+            {
+                isClimbSoundPlaying = false;
+                CancelInvoke("PlayClimbSound"); // Stop the repeating calls
+                if (SoundManager.Instance.currentMusic != null)
+                {
+                    SoundManager.Instance.currentMusic.ForceStop();
+                }
+            }
+
             isClimbing = false;
-            RegenerateStamina();
             // Ensure gravity is on when not climbing.
             rb.useGravity = true;
         }
@@ -156,11 +184,7 @@ public class AdvancedMoveController : MovementController
             RequestJump(true);
         }
 
-        // Regenerate stamina when grounded.
-        if (isGrounded)
-        {
-            climbStamina = Mathf.Min(100f, climbStamina + climbStaminaRegen * Time.deltaTime);
-        }
+        
 
         if (isClimbing)
         {
@@ -174,6 +198,7 @@ public class AdvancedMoveController : MovementController
             }
         }
         wasGrounded = isGrounded;
+        climbStamina = isGrounded ? RegenerateStamina() : climbStamina;
     }
 
     private void OnDrawGizmos()
@@ -450,13 +475,19 @@ public class AdvancedMoveController : MovementController
         rb.velocity = Vector3.zero;
     }
 
-    private void RegenerateStamina()
+    private float RegenerateStamina()
     {
         // Regenerate stamina when not climbing.
         if (!isClimbing && climbStamina < 100f)
         {
             climbStamina = Mathf.Min(100f, climbStamina + climbStaminaRegen * Time.deltaTime);
         }
+        return climbStamina;
+    }
+
+    private void PlayClimbSound()
+    {
+        climbAudio.PlaySound(transform.position);
     }
 
     /// <summary>

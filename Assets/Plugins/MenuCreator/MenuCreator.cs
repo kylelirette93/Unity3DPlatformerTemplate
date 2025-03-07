@@ -20,7 +20,7 @@ public class MenuCreator : MonoBehaviour
     protected VisualElement m_InteractWindow,m_LoadingIcon;
     protected Label m_InteractLabel,m_DebugText;
     [HideInInspector]
-    public Label m_MenuTitle,m_LoadingLabel, m_BottomLeftLabel, m_MiddleScreenLabel;
+    public Label m_MenuTitle,m_LoadingLabel, m_BottomLeftLabel, m_BottomRightLabel, m_MiddleScreenLabel;
 
 
     public virtual void Awake()
@@ -34,6 +34,7 @@ public class MenuCreator : MonoBehaviour
         m_MenuPanel = m_Root.Q<VisualElement>("MenuPanel");
         m_MenuTitle = m_Root.Q<Label>("MenuTitle");
         m_BottomLeftLabel = m_Root.Q<Label>("BottomLeftText");
+        m_BottomRightLabel = m_Root.Q<Label>("BottomRightText");
         m_MiddleScreenLabel = m_Root.Q<Label>("MiddleScreenText");
         m_LoadingLabel = m_MenuHolder.Q<Label>("LoadingLabel");
         m_LoadingIcon = m_MenuHolder.Q<VisualElement>("LoadingIcon");
